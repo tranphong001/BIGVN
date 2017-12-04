@@ -10,12 +10,13 @@ import { getTopics } from './DangBlogReducer';
 import  CKEditor from 'react-ckeditor-component';
 import styles from '../../main.css';
 import 'react-image-crop/dist/ReactCrop.css';
-import {Cropper} from 'react-image-cropper'
+import { Cropper } from 'react-image-cropper';
+import style from 'react-tag-autocomplete/example/styles.css';
+import ReactTags from 'react-tag-autocomplete';
 
 class DangBlogPages extends Component {
   constructor(props) {
     super(props);
-    //this.updateContent = this.updateContent.bind(this);
     this.state = {
       topic: '',
 
@@ -34,6 +35,8 @@ class DangBlogPages extends Component {
       isAction: false,
 
       isSubmitting: false,
+      tags: [],
+      suggestions: [{ id: 3, name: 'Bananas' }]
     };
   }
   componentWillMount() {
@@ -76,6 +79,7 @@ class DangBlogPages extends Component {
         content: this.state.content,
         imagesBase64: this.state.imagesBase64,
         thumbnail: this.state.thumbnail,
+        keywords: this.state.tags,
       };
       console.log(blog);
       this.setState({ isSubmitting: true });
@@ -116,24 +120,16 @@ class DangBlogPages extends Component {
   };
 
   onAction = (index) => { this.setState({ isAction: true, thumbnailTemp: index }); };
-  onHideAction = () => { this.setState({ isAction: false }); };
 
-  pickThumbnail = () => {
-    this.setState({ thumbnail: this.state.thumbnailTemp, isAction: false });
+  handleDelete = (i) => {
+    const tags = this.state.tags.slice(0);
+    tags.splice(i, 1);
+    this.setState({ tags });
   };
-  deleteUploadImage = () => {
-    if (this.state.thumbnailTemp >= this.state.thumbnail) {
-      this.setState({
-        imagesBase64: this.state.imagesBase64.filter((image, index) => index != this.state.thumbnailTemp),
-        isAction: false,
-        thumbnail: 0
-      });
-    } else {
-      this.setState({
-        imagesBase64: this.state.imagesBase64.filter((image, index) => index != this.state.thumbnailTemp),
-        isAction: false
-      });
-    }
+
+  handleAddition = (tag) => {
+    const tags = [].concat(this.state.tags, tag);
+    this.setState({ tags });
   };
   render() {
     return (
@@ -141,7 +137,7 @@ class DangBlogPages extends Component {
         <div className="panel panel-default col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
           <div className="col-md-10 col-md-offset-1">
             <div className={styles.registerTitle}>
-            <p className={styles.postNews}>ĐĂNG BLOG</p>
+              <p className={styles.postNews}>ĐĂNG BLOG</p>
             <div className="form-horizontal">
 
               <div className="form-group">
@@ -241,13 +237,19 @@ class DangBlogPages extends Component {
 
               <div className="form-group">
                 <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Từ khóa</label>
-                <div className="col-sm-9">
-                  <input className="form-control" type="text"  />
+
+                <div className="col-sm-9" style={{ textAlign: 'left', fontSize: '11pt' }}>
+                  <ReactTags
+                    tags={this.state.tags}
+                    suggestions={this.state.suggestions}
+                    handleDelete={this.handleDelete}
+                    handleAddition={this.handleAddition}
+                  />
                 </div>
               </div>
 
               <div className="form-group">
-                <div className="col-md-3"></div>
+                <div className="col-md-3" />
                 <div className="col-sm-9" style={{ textAlign: 'left', fontSize: '11pt' }}>
                   <label>
                     <input type="checkbox" checked={this.state.check} onChange={this.handleCheck} className={styles.marginRight10} />
@@ -257,7 +259,7 @@ class DangBlogPages extends Component {
               </div>
 
               <div className="form-group">
-                <div className="col-md-3"></div>
+                <div className="col-md-3" />
                 <div className="col-sm-9">
                   <button onClick={this.submit} className={styles.submitPost} disabled={this.state.isSubmitting} >
                     {this.state.isSubmitting ? 'ĐANG GỬI' : 'ĐĂNG TIN'}
@@ -265,7 +267,7 @@ class DangBlogPages extends Component {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
           </div>
           <Modal
             show={this.state.isCrop}

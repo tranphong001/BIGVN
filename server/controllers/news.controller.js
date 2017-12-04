@@ -4,6 +4,7 @@ import Topic from '../models/topic';
 import Setting from '../models/setting';
 import Category from '../models/category';
 import City from '../models/city';
+import Keyword from '../models/keyword';
 import cuid from 'cuid';
 import fs from 'fs';
 import KhongDau from 'khong-dau';
@@ -14,7 +15,7 @@ import imageminJpegtran from 'imagemin-jpegtran';
 import imageminPngquant from 'imagemin-pngquant';
 
 function writeImage(base64image) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     const ext = base64image.split(';')[0].match(/jpeg|png|gif/)[0];
     const data = base64image.replace(/^data:image\/\w+;base64,/, '');
     const buf = new Buffer(data, 'base64');
@@ -23,13 +24,13 @@ function writeImage(base64image) {
 
     fs.writeFile(`public/${srcImageName}.${ext}`, buf, (err) => {
       if (err) {
-        reject('error')
+        reject('error');
       } else {
         imagemin([`public/${srcImageName}.${ext}`], './public', {
           plugins: [
             imageminJpegtran(),
-            imageminPngquant({quality: '65-80'})
-          ]
+            imageminPngquant({ quality: '70-80' }),
+          ],
         }).then(files => {
           const imageName = `${date.toString()}_${cuid()}`;
           fs.writeFile(`public/${imageName}.${ext}`, files[0].data, (err2) => {
@@ -213,16 +214,16 @@ export function createNews(req, res) {
         return;
       }
     } else {
-      if (!reqNews.hasOwnProperty('topic')) {
+      if (!reqNews.hasOwnProperty('topic') || !reqNews.hasOwnProperty('keywords') ) {
         res.json({ news: 'missing' });
         bool = false;
         return;
       }
     }
     if (bool) {
-      User.findOne({_id: mongoose.Types.ObjectId(reqNews.userId), newser: true}).exec((userErr, user) => {
+      User.findOne({ _id: mongoose.Types.ObjectId(reqNews.userId), newser: true }).exec((userErr, user) => {
         if (userErr) {
-          res.json({news: 'error'});
+          res.json({ news: 'error' });
         } else {
           if (user) {
             const promises = [];
@@ -230,7 +231,27 @@ export function createNews(req, res) {
               promises.push(writeImage(base64));
             });
             Promise.all(promises).then((imageDirectories) => {
-              const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, " ").trim().replace(/ {1,}/g," ").replace(/ /g, '-');
+              reqNews.keywords.map((k) => {
+                const keywordTemp = KhongDau(k.name).toString().toLowerCase()
+                                                            .replace(/[^0-9a-z]/gi, ' ').trim()
+                                                            .replace(/ {1,}/g, ' ').replace(/ /g, '-');
+                Keyword.findOneAndUpdate(
+                  { alias: keywordTemp },
+                  { alias: keywordTemp, title: k.name },
+                  { upsert: true, new: true, setDefaultsOnInsert: true },
+                  (error, result) => {
+                    if (!error) {
+                      if (!result) {
+                        const newKeyword = new Keyword({
+                          alias: keywordTemp,
+                          title: k.name,
+                        });
+                        newKeyword.save(() => {});
+                      }
+                    }
+                  });
+              });
+              const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, ' ').trim().replace(/ {1,}/g, ' ').replace(/ /g, '-');
               const titleSearch = KhongDau(reqNews.title.trim()).toString().toLowerCase();
               const news = new News({
                 category: reqNews.category,

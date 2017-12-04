@@ -11,7 +11,10 @@ const newsSchema = new Schema({
   type: { type: 'String', required: true },
   address: { type: 'String' },
   title: { type: 'String', required: true, maxLength: [40, 'Độ dài vượt quá 40 từ.'] },
-  titleSearch: { type: 'String', required: true,  },
+  titleSearch: { type: 'String', required: true },
+  keywords: [
+    { type: Schema.Types.ObjectId, ref: 'Keyword' }
+  ],
   metaKeyword: { type: 'String', default: '', maxLength: [200, 'Độ dài vượt quá 200 từ.'] },
   metaDescription: { type: 'String', default: '', maxLength: [200, 'Độ dài vượt quá 200 từ.'] },
   alias: { type: 'String', required: true, unique: true },
@@ -22,7 +25,7 @@ const newsSchema = new Schema({
   content: { type: 'String', required: true, maxLength: [2000, 'Độ dài vượt quá 2000 từ.'] },
   summary: { type: 'String', default: '', maxLength: [200, 'Độ dài vượt quá 200 từ.'] },
   comment: { type: 'String', default: '' },
-  imageDirectories:[
+  imageDirectories: [
     { type: 'String', required: true },
   ],
   thumbnail: { type: 'number', require: true },
