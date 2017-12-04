@@ -1,0 +1,343 @@
+.noneBlue a:active {
+  outline: none !important;
+}
+.noneBlue a:focus {
+  outline: none !important;
+}
+.headerBottonStyle {
+  color:#fff;
+}
+.headerBottonStyle>a{
+  padding: 8px !important;
+}
+.header {
+  background: #eee url('../../header-bk.png') center;
+  background-size: cover;
+  border-bottom: 1px solid #ccc;
+}
+
+.content {
+  width: 100%;
+  max-width: 980px;
+  margin: auto;
+  padding: 64px 16px;
+  overflow: auto;
+}
+
+.site-title {
+  font-weight: 300;
+  font-size: 42px;
+  float: left;
+}
+
+.site-title a {
+  text-decoration: none;
+  color: #FFF;
+}
+
+.add-post-button {
+  display: inline-block;
+  color: #FFF;
+  background: #03A9F4;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 1000px;
+  float: right;
+}
+
+.language-switcher {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.language-switcher ul {
+  list-style: none;
+  width: 980px;
+  margin: auto;
+  text-align: right;
+}
+
+.language-switcher li {
+  display: inline-block;
+  margin: 10px;
+  padding: 5px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.language-switcher li:first-child {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.selected {
+  border-bottom: 1px solid #fff;
+}
+@media (max-width: 767px){
+  .add-post-button{
+    float: left;
+    margin-top: 16px;
+  }
+}
+.openForm {
+  display: block !important;
+}
+
+.closeForm {
+  display: none !important;
+}
+@media (max-width: 1199px) {
+  .formWidthWhenOpen {
+    width: 49%;
+  }
+  .customForm > form {
+    width: 100%;
+  }
+  .customForm2 > form {
+    width: 100%;
+  }
+  .onlyIn480 {
+    display: block;
+  }
+  .free480 {
+    display: block;
+    width: 200px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 10px;
+    padding-bottom: 38px;
+  }
+  .takeFormSpage {
+    margin-top: -31px;
+  }
+}
+@media (min-width: 768px) {
+  .customForm > form {
+    width: 100%;
+  }
+  .customForm2 > form {
+    width: 100%;
+  }
+  .onlyIn480 {
+    display: none;
+  }
+}
+@media (min-width: 1200px) {
+  .free480 {
+    display: none;
+  }
+  .onlyIn480 {
+    display: none;
+  }
+  .customForm > form {
+    margin-left: 50px;
+    width: 591px;
+  }
+  .customForm > form > div {
+    margin-bottom: 0 !important;
+  }
+  .customForm2 > form {
+    margin-left: 50px;
+    width: 566px;
+  }
+  .customForm2 > form > div {
+    margin-bottom: 0 !important;
+  }
+}
+.headerLogInButton > a {
+  padding-left: 35px !important;
+  padding-right: 12px !important;
+  padding-top: 10px !important;
+  color: white !important;
+  font-size: 13px;
+}
+.headerLogOutButton > a {
+  padding-left: 12px !important;
+  padding-right: 35px !important;
+  padding-top: 10px !important;
+  color: white !important;
+  font-size: 13px;
+}
+.headerFreeButton > a {
+  padding: 0 !important;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+.headerFree2Button > a {
+  padding: 0 !important;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+.headerFree2Button {
+  margin-top: 9px;
+}
+.headerAfterLogIn > li > ul {
+  margin-top: -12px !important;
+}
+.headerAfterLogIn > li > a {
+  color: white !important;
+  background-color: rgb(4, 78, 125) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  margin-top: 4px !important;
+}
+.headerAfterLogIn > li > ul > li > a {
+  padding-left: 0;
+}
+.headerAfterLogIn > li > ul > li > a > span {
+  padding-left: 10px;
+}
+.customForm {
+  display: table-cell;
+}
+.customForm > form {
+  border: none;
+  box-shadow: none;
+}
+.customForm2 > form {
+  border: none;
+  box-shadow: none;
+}
+.searchBox {
+  width: 40%;
+}
+.searchBox > li > a {
+  padding-bottom: 0;
+}
+.searchBox > li > a > div {
+}
+.customDropDown > span > ul > li > a {
+  color: #34599D !important;
+}
+.customDropDown >span>button{
+  background-color: #FFFFFF !important;
+  text-shadow: 0 1px 0 #fff;
+  background-image: none;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe0e0e0', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+  border-right: none;
+}
+.colorWhite {
+  color: #FFF !important;
+}
+.colorBlack > ul > li > a {
+  color: black !important;
+}
+.colorWhite1 {
+  /*border-right: 1px solid #333 !important;*/
+}
+.freePostButton {
+  text-align: center !important;
+  width: 100px !important;
+  background-color: #FF6600 !important;
+  border: 0 !important;
+  color: #FFF !important;
+  padding: 7px !important;
+  position: relative !important;
+  margin-right: 5px;
+}
+.freeButton > div > span {
+  font-size: 13pt;
+}
+.fontSizeheaderRight > a {
+  font-size: 11pt;
+}
+.loginButton {
+  margin: 0;
+  vertical-align: middle;
+  padding: 5px;
+  font-size: 11pt;
+  display: inline-block;
+  text-align: center;
+}
+.loginButton:hover {
+  text-decoration: none;
+  color: #FF6601 !important;
+}
+.navVerticalSpliter  > a {
+  padding: 0 !important;
+  cursor: none;
+  text-decoration: none;
+}
+.verticalSpliter {
+  height: 10px !important;
+  margin-top: 15px !important;;
+  width: 1px;
+  display: inline;
+  border-right: 1px solid #fff;
+}
+@media (min-width: 768px) {
+  .customDropDown>input{
+    width:120px !important;
+  }
+}
+@media (min-width: 480px) {
+  .loginRegisterButtons {
+    float: none;
+  }
+  .forDesktopOnly {
+    display: block;
+  }
+  .dropDownLogin {
+    display: none;
+  }
+  .notShowInMobile {
+    display: none;
+  }
+  .notShowHeaderInMobile {
+    display: none;
+  }
+}
+.rightHeaderButtonGroup > a {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+.choVangButtonMenu > a {
+  color: black !important;
+  font-size: 11pt;
+  z-index: 9 !important;
+  margin-left: -10px !important;
+  padding-right: 10px !important;
+}
+
+.choVangButton {
+  background-image: none;
+  background-color: white;
+  /*background-color: rgb(4, 78, 125);*/
+  border-color: white;
+  z-index: 9;
+}
+.choVangButton:active {
+  background-image: none;
+  background-color: white;
+  border-color: white;
+}
+.navbarHeader {
+  text-align: center !important;
+}
+.dropDownLogin{
+  float: right !important;
+  padding-top: 7px !important;
+  padding-right: 15px !important;
+}
+.dropDownMenuLogin > a {
+  color: black !important;
+  font-size: 11pt;
+}
+.dropDownMenuLogin {
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+  width: 200px;
+}
+.mobileDropDownMenu > a {
+  color: black !important;
+}
+.headerMenuDropDown > span > ul {
+  top: 32px;
+}
+
+.higherZIndex {
+  z-index: 1;
+}
+.marginRightDropDown {
+  margin-top: 4px;
+}

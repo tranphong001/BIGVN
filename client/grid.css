@@ -1,0 +1,319 @@
+.customNavbar {
+  background-color: rgb(4, 78, 125) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 2px;
+  padding-top: 3px;
+}
+
+.customHeader > div > form > div {
+  margin-bottom: 0 !important;
+  margin-top: 6px !important;
+}
+
+.navbar {
+  height: 40px !important;
+  min-height: 40px !important;
+  margin-bottom: 0 !important;
+  width: 100%;
+}
+.navbar > div > div > ul > li > a  {
+  padding: 0 !important;
+  top: 50%;
+  transform: translateY(50%);
+  color: rgba(17, 17, 17, 255) !important;
+}
+.navbar > div > div > ul > li > a > span  {
+  margin-left: 8px;
+  padding-right: 8px;
+  /*border-right: 1px solid black;*/
+}
+
+.itemParent:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+.itemParent:hover > div > div > p {
+  color: rgb(255, 102, 0) !important;
+}
+.itemParent {
+  margin-bottom: 10px !important;
+}
+.itemContent {
+  position: relative;
+}
+.itemContent > div > p {
+  margin-bottom: 0 !important;
+}
+.itemContent > div:nth-child(2) > p {
+  max-width: 95%;
+}
+
+.vipClass > a {
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+.vipClass > a:hover {
+  text-decoration: none !important;
+  color: #FF6601 !important;
+}
+
+@media (max-width: 768px) {
+  .customNavbar > div {
+    width: 95vw !important;
+    margin: auto!important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .customNavbar {
+    width: 100vw;
+  }
+  .customHeader {
+    display: table;
+    width: 100%;
+    margin-bottom: 9px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .customCollapse {
+    display: none !important;
+  }
+  .headerFree480 {
+    display: flex;
+    margin: 10px auto 10px auto !important;
+    justify-content: center;
+  }
+  .hrHeader {
+    display: block;
+    margin: 0 auto 0 auto !important;
+    width: 95% !important;
+  }
+
+  .content {
+    width: 95%;
+    margin: auto !important;
+  }
+  .content > div {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .contentWidth {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .contentWidthDetail {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .itemContent {
+    display: inline-block;
+    margin-left: 15px;
+    width: calc(100% - 115px);
+    max-width: calc(100% - 115px);
+  }
+
+  .vipClass {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    padding-bottom: 5px !important;
+  }
+}
+@media (max-width: 1200px) {
+  .customCollapse {
+    display: none !important;
+  }
+  .headerForm {
+    display: block !important;
+  }
+  .logoAndToggle {
+    display: flex;
+  }
+  .navbar {
+    display: none;
+  }
+  .customNavbarMoved > div {
+    width: 200vw !important;
+    margin-left: -100% !important;
+    padding-left: 2.5% !important;
+    padding-right: 2.5% !important;
+  }
+
+}
+@media (max-width: 757px) {
+  .itemList {
+    width: 100%;
+  }
+}
+@media (min-width: 757px) {
+  .itemList {
+    width: 47%;
+  }
+}
+@media (min-width: 768px) {
+  .customNavbar > div {
+    width: 95vw;
+    margin: auto ;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .customNavbar > div > div:nth-child(2) {
+    text-align: center;
+  }
+  .customNavbar {
+    width: 100vw;
+  }
+  .customHeader {
+    display: table;
+    width: 100%;
+    margin-top: 2px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .headerFree480 {
+    display: flex;
+    margin: 10px auto 10px auto !important;
+    justify-content: center;
+  }
+  .hrHeader {
+    display: block;
+    margin: 0 auto 0 auto !important;
+    width: 95% !important;
+  }
+  .centerizeNav {
+    float: none;
+    display: inline-block;
+  }
+
+  .content {
+    width: 95%;
+    margin: auto !important;
+  }
+  .content > div {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .contentWidth {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .contentWidthDetail {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-right: 4px;
+  }
+  .itemContent {
+    display: inline-block;
+    margin-left: 15px;
+    width: calc(100% - 115px);
+    max-width: calc(100% - 115px);
+  }
+
+  .vipClass {
+    width: 47% !important;
+    margin-bottom: 10px !important;
+  }
+}
+@media (min-width: 992px) {
+  .loginLogoutPage {
+    margin-left: 29% !important;
+  }
+}
+@media (min-width: 1200px) {
+  .itemList {
+    width: 100%;
+  }
+  .customNavbar {
+    height: 60px;
+    width: 100%;
+  }
+  .customNavbar > div {
+    width: 1140px !important;
+    margin: auto!important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .customNavbar > div > div:nth-child(2) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border: none;
+    box-shadow: none;
+    width: 1140px;
+  }
+  .customHeader {
+    display: table;
+    width: auto;
+    margin-top: 9px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .headerForm {
+    display: none;
+  }
+
+  .headerFree480 {
+    display: none;
+  }
+  .hrHeader {
+    display: none;
+  }
+
+  .navbar > div {
+    width: 1140px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .content {
+    width: 1180px;
+    margin: auto !important;
+  }
+  .content > div {
+    width: 1180px;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .contentWidth {
+    width: 615px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .contentWidthDetail {
+    width: 610px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-right: 4px;
+  }
+  .itemContent {
+    display: inline-block;
+    width: 430px;
+    margin-left: 17px;
+  }
+
+  .vipClass {
+    width: 120px;
+  }
+  .vipClass:nth-child(odd) {
+    margin-left: 5px;
+  }
+  .vipClass:nth-child(even) {
+    margin-right: 5px;
+  }
+}
