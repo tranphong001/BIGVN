@@ -23,6 +23,8 @@ class DangBlogPages extends Component {
       title: '',
       content: '',
       summary: '',
+      metaKeyword: '',
+      metaDescription: '',
 
       check: false,
 
@@ -52,9 +54,18 @@ class DangBlogPages extends Component {
     });
   };
   onChange2 = (evt) => {
-    // const newContent = evt.editor.getData();
     this.setState({
       summary: evt.target.value
+    });
+  };
+  onMetaDescription= (evt) => {
+    this.setState({
+      metaDescription: evt.target.value
+    });
+  };
+  onMetaKeyword = (evt) => {
+    this.setState({
+      metaKeyword: evt.target.value
     });
   };
   onChange = (evt) => {
@@ -76,6 +87,8 @@ class DangBlogPages extends Component {
         type: 'blog',
         title: this.state.title,
         summary: this.state.summary,
+        metaKeyword: this.state.metaKeyword,
+        metaDescription: this.state.metaDescription,
         content: this.state.content,
         imagesBase64: this.state.imagesBase64,
         thumbnail: this.state.thumbnail,
@@ -162,9 +175,23 @@ class DangBlogPages extends Component {
               </div>
 
               <div className="form-group">
-                <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Tóm tắt</label>
+                <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Meta Keyword</label>
                 <div className="col-sm-9">
                   <textarea rows="4" className="form-control" type="text" value={this.state.summary} onChange={this.onChange2} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Meta Description</label>
+                <div className="col-sm-9">
+                  <textarea rows="4" className="form-control" type="text" value={this.state.metaDescription} onChange={this.onMetaDescription} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Đoạn mô tả ngắn</label>
+                <div className="col-sm-9">
+                  <textarea rows="4" className="form-control" type="text" value={this.state.metaKeyword} onChange={this.onMetaKeyword} />
                 </div>
               </div>
 

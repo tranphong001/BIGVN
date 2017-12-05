@@ -214,7 +214,8 @@ export function createNews(req, res) {
         return;
       }
     } else {
-      if (!reqNews.hasOwnProperty('topic') || !reqNews.hasOwnProperty('keywords') ) {
+      if (!reqNews.hasOwnProperty('topic')
+      ) {
         res.json({ news: 'missing' });
         bool = false;
         return;
@@ -227,6 +228,7 @@ export function createNews(req, res) {
         } else {
           if (user) {
             const promises = [];
+            const keywordArr = [];
             reqNews.imagesBase64.map((base64) => {
               promises.push(writeImage(base64));
             });
@@ -246,13 +248,20 @@ export function createNews(req, res) {
                           alias: keywordTemp,
                           title: k.name,
                         });
-                        newKeyword.save(() => {});
+                        newKeyword.save((errSave) => {
+                          if (!errSave) {
+                            keywordArr.push(newKeyword._id);
+                          }
+                        });
+                      } else {
+                        keywordArr.push(result._id);
                       }
                     }
                   });
               });
               const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, ' ').trim().replace(/ {1,}/g, ' ').replace(/ /g, '-');
               const titleSearch = KhongDau(reqNews.title.trim()).toString().toLowerCase();
+              console.log(keywordArr);
               const news = new News({
                 category: reqNews.category,
                 topic: reqNews.topic,
@@ -263,7 +272,10 @@ export function createNews(req, res) {
                 type: reqNews.type,
                 address: reqNews.address,
                 title: reqNews.title,
+                metaDescription: reqNews.metaDescription,
+                metaKeyword: reqNews.metaKeyword,
                 titleSearch,
+                keyword: keywordArr,
                 price: reqNews.price,
                 content: reqNews.content,
                 summary: reqNews.summary,
