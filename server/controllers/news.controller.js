@@ -24,6 +24,7 @@ function writeImage(base64image) {
 
     fs.writeFile(`public/${srcImageName}.${ext}`, buf, (err) => {
       if (err) {
+        console.log(err);
         reject('error');
       } else {
         imagemin([`public/${srcImageName}.${ext}`], './public', {
@@ -35,7 +36,8 @@ function writeImage(base64image) {
           const imageName = `${date.toString()}_${cuid()}`;
           fs.writeFile(`public/${imageName}.${ext}`, files[0].data, (err2) => {
             if (err2) {
-              reject('error')
+              console.log(err2);
+              reject('error');
             } else {
               fs.unlink(`public/${srcImageName}.${ext}`, (err) => {});
               resolve(`${imageName}.${ext}`);
@@ -185,6 +187,13 @@ export function updateNews(req, res) {
     res.json({ news: 'missing' });
   }
 }
+function titleCase(str) {
+  var splitStr = str.toLowerCase().split(' ');
+  for (var i = 0; i < splitStr.length; i++) {
+    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+  }
+  return splitStr.join(' ');
+}
 export function createNews(req, res) {
   const reqNews = req.body.news;
   if (reqNews &&
@@ -233,6 +242,7 @@ export function createNews(req, res) {
               promises.push(writeImage(base64));
             });
             Promise.all(promises).then((imageDirectories) => {
+              console.log('1');
               reqNews.keywords.map((k) => {
                 const keywordTemp = KhongDau(k.name).toString().toLowerCase()
                                                             .replace(/[^0-9a-z]/gi, ' ').trim()
@@ -243,22 +253,13 @@ export function createNews(req, res) {
                   { upsert: true, new: true, setDefaultsOnInsert: true },
                   (error, result) => {
                     if (!error) {
-                      if (!result) {
-                        const newKeyword = new Keyword({
-                          alias: keywordTemp,
-                          title: k.name,
-                        });
-                        newKeyword.save((errSave) => {
-                          if (!errSave) {
-                            keywordArr.push(newKeyword._id);
-                          }
-                        });
-                      } else {
-                        keywordArr.push(result._id);
-                      }
+                      console.log('found');
+                      console.log(result);
+                      keywordArr.push(result._id);
                     }
                   });
               });
+              console.log('2');
               const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, ' ').trim().replace(/ {1,}/g, ' ').replace(/ /g, '-');
               const titleSearch = KhongDau(reqNews.title.trim()).toString().toLowerCase();
               console.log(keywordArr);
@@ -284,18 +285,18 @@ export function createNews(req, res) {
                 thumbnail: reqNews.thumbnail,
               });
               news.alias = (reqNews.type === 'news') ? `${alias}-${news._id}` : alias;
-              news.save((err) => {
-                if (err) {
-                  res.json({news: 'error'});
+              news.save((err5) => {
+                if (err5) {
+                  res.json({ news: 'error' });
                 } else {
-                  res.json({news: 'success'});
+                  res.json({ news: 'success' });
                 }
               });
             }, (err) => {
-              res.json({news: 'error'});
+              res.json({ news: 'error' });
             });
           } else {
-            res.json({news: 'error'});
+            res.json({ news: 'error' });
           }
         }
       });

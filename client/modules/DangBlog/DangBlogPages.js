@@ -38,7 +38,7 @@ class DangBlogPages extends Component {
 
       isSubmitting: false,
       tags: [],
-      suggestions: [{ id: 3, name: 'Bananas' }]
+      suggestions: [{ id: 3, name: 'Bananas' }],
     };
   }
   componentWillMount() {
@@ -65,13 +65,13 @@ class DangBlogPages extends Component {
   };
   onMetaKeyword = (evt) => {
     this.setState({
-      metaKeyword: evt.target.value
+      metaKeyword: evt.target.value,
     });
   };
   onChange = (evt) => {
     const newContent = evt.editor.getData();
     this.setState({
-      content: newContent
+      content: newContent,
     });
   };
   selectTopic = (event) => {
@@ -80,6 +80,10 @@ class DangBlogPages extends Component {
   handleTitle = (eventKey) => { this.setState({ title: eventKey.target.value }); };
   handleCheck = () => { this.setState({ check: !this.state.check }); };
   submit = () => {
+    if (this.state.imagesBase64.length === 0) {
+      this.props.dispatch(setNotify('Vui lòng tải lên một ảnh nền'));
+      return;
+    }
     if (this.state.check) {
       const blog = {
         userId: this.props.id,
@@ -140,11 +144,19 @@ class DangBlogPages extends Component {
     this.setState({ tags });
   };
 
+  titleCase = (str) => {
+    const splitStr = str.toLowerCase().split(' ');
+    for (let i = 0; i < splitStr.length; i++) {
+      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+    }
+    return splitStr.join(' ');
+  };
   handleAddition = (tag) => {
-    const tags = [].concat(this.state.tags, tag);
+    const tags = [].concat(this.state.tags, { name: this.titleCase(tag.name) });
     this.setState({ tags });
   };
   render() {
+    console.log(this.state.tags);
     return (
       <div>
         <div className="panel panel-default col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
@@ -268,6 +280,8 @@ class DangBlogPages extends Component {
                 <div className="col-sm-9" style={{ textAlign: 'left', fontSize: '11pt' }}>
                   <ReactTags
                     tags={this.state.tags}
+                    allowNew
+                    delimiterChars ={[',']}
                     suggestions={this.state.suggestions}
                     handleDelete={this.handleDelete}
                     handleAddition={this.handleAddition}
