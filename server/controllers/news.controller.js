@@ -21,10 +21,8 @@ function writeImage(base64image) {
     const buf = new Buffer(data, 'base64');
     const date = Date.now();
     const srcImageName = `${date.toString()}_${cuid()}`;
-
     fs.writeFile(`public/${srcImageName}.${ext}`, buf, (err) => {
       if (err) {
-        console.log(err);
         reject('error');
       } else {
         imagemin([`public/${srcImageName}.${ext}`], './public', {
@@ -36,17 +34,33 @@ function writeImage(base64image) {
           const imageName = `${date.toString()}_${cuid()}`;
           fs.writeFile(`public/${imageName}.${ext}`, files[0].data, (err2) => {
             if (err2) {
-              console.log(err2);
               reject('error');
             } else {
               fs.unlink(`public/${srcImageName}.${ext}`, (err) => {});
               resolve(`${imageName}.${ext}`);
             }
           });
-          // => [{data: <Buffer 89 50 4e …>, path: 'build/images/foo.jpg'}, …]
         });
       }
     });
+  });
+}
+function addKeyword(newKeyword) {
+  return new Promise((resolve, reject) => {
+    const keywordTemp = KhongDau(newKeyword.name).toString().toLowerCase()
+      .replace(/[^0-9a-z]/gi, ' ').trim()
+      .replace(/ {1,}/g, ' ').replace(/ /g, '-');
+    Keyword.findOneAndUpdate(
+      { alias: keywordTemp },
+      { alias: keywordTemp, title: newKeyword.name },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+      (error, result) => {
+        if (!error) {
+          resolve(result._id);
+        } else {
+          reject('error');
+        }
+      });
   });
 }
 export function updateNews(req, res) {
@@ -188,8 +202,8 @@ export function updateNews(req, res) {
   }
 }
 function titleCase(str) {
-  var splitStr = str.toLowerCase().split(' ');
-  for (var i = 0; i < splitStr.length; i++) {
+  let splitStr = str.toLowerCase().split(' ');
+  for (let i = 0; i < splitStr.length; i++) {
     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
   }
   return splitStr.join(' ');
@@ -237,61 +251,50 @@ export function createNews(req, res) {
         } else {
           if (user) {
             const promises = [];
+            const promises2 = [];
             const keywordArr = [];
             reqNews.imagesBase64.map((base64) => {
               promises.push(writeImage(base64));
             });
             Promise.all(promises).then((imageDirectories) => {
-              console.log('1');
               reqNews.keywords.map((k) => {
-                const keywordTemp = KhongDau(k.name).toString().toLowerCase()
-                                                            .replace(/[^0-9a-z]/gi, ' ').trim()
-                                                            .replace(/ {1,}/g, ' ').replace(/ /g, '-');
-                Keyword.findOneAndUpdate(
-                  { alias: keywordTemp },
-                  { alias: keywordTemp, title: k.name },
-                  { upsert: true, new: true, setDefaultsOnInsert: true },
-                  (error, result) => {
-                    if (!error) {
-                      console.log('found');
-                      console.log(result);
-                      keywordArr.push(result._id);
-                    }
-                  });
+                promises2.push(addKeyword(k));
               });
-              console.log('2');
-              const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, ' ').trim().replace(/ {1,}/g, ' ').replace(/ /g, '-');
-              const titleSearch = KhongDau(reqNews.title.trim()).toString().toLowerCase();
-              console.log(keywordArr);
-              const news = new News({
-                category: reqNews.category,
-                topic: reqNews.topic,
-                userId: reqNews.userId,
-                city: reqNews.city,
-                district: reqNews.district,
-                ward: reqNews.ward,
-                type: reqNews.type,
-                address: reqNews.address,
-                title: reqNews.title,
-                metaDescription: reqNews.metaDescription,
-                metaKeyword: reqNews.metaKeyword,
-                titleSearch,
-                keyword: keywordArr,
-                price: reqNews.price,
-                content: reqNews.content,
-                summary: reqNews.summary,
-                contact: reqNews.contact,
-                imageDirectories: imageDirectories,
-                thumbnail: reqNews.thumbnail,
+              Promise.all(promises2).then((keywords) => {
+                console.log(keywords);
+                const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, ' ').trim().replace(/ {1,}/g, ' ').replace(/ /g, '-');
+                const titleSearch = KhongDau(reqNews.title.trim()).toString().toLowerCase();
+                const news = new News({
+                  category: reqNews.category,
+                  topic: reqNews.topic,
+                  userId: reqNews.userId,
+                  city: reqNews.city,
+                  district: reqNews.district,
+                  ward: reqNews.ward,
+                  type: reqNews.type,
+                  address: reqNews.address,
+                  title: reqNews.title,
+                  metaDescription: reqNews.metaDescription,
+                  metaKeyword: reqNews.metaKeyword,
+                  titleSearch,
+                  keywords,
+                  price: reqNews.price,
+                  content: reqNews.content,
+                  summary: reqNews.summary,
+                  contact: reqNews.contact,
+                  imageDirectories: imageDirectories,
+                  thumbnail: reqNews.thumbnail,
+                });
+                news.alias = (reqNews.type === 'news') ? `${alias}-${news._id}` : alias;
+                news.save((err5) => {
+                  if (err5) {
+                    res.json({ news: 'error' });
+                  } else {
+                    res.json({ news: 'success' });
+                  }
+                });
               });
-              news.alias = (reqNews.type === 'news') ? `${alias}-${news._id}` : alias;
-              news.save((err5) => {
-                if (err5) {
-                  res.json({ news: 'error' });
-                } else {
-                  res.json({ news: 'success' });
-                }
-              });
+
             }, (err) => {
               res.json({ news: 'error' });
             });
@@ -309,58 +312,6 @@ export function getAlias(req, res) {
   console.log('abcdef');
 }
 
-export function getNewsByAlias(req, res) {
-  News.findOne({ alias: { $regex: req.params.alias, $options: 'i' }, approved: true, type: 'news' })
-    .populate('category', 'title alias')
-    .populate('topic', 'title alias')
-    .populate('city', 'name')
-    .exec((err, news) => {
-      if (err) {
-        res.json({ news: 'error' });
-      } else {
-        if (news) {
-          res.json({ news });
-        } else {
-          res.json({ news: '404' });
-        }
-      }
-    });
-}
-export function getNewsByCategory(req, res) {
-  const page = (req.query.page && req.query.page !== '') ? req.query.page : 0;
-  Category.findOne({ alias: { $regex: req.params.category, $options: 'i' }, status: 0 }).exec((err, cate) => {
-    if (err) {
-      res.json({ news: [] });
-    } else {
-      if (cate) {
-        Setting.findOne({name: 'newsCount'}).exec((errSetting, max) => {
-          if (errSetting) {
-            res.json({ news: [] });
-          } else {
-            News.find(
-              { category: mongoose.Types.ObjectId(cate._id), approved: true, vipAll: false, vipCategory: false, type: 'news' },
-              {},
-              { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
-            )
-              .sort({ dateCreated: -1 })
-              .populate('category', 'title alias')
-              .populate('topic', 'title alias')
-              .populate('city', 'name')
-              .exec((err1, news) => {
-                if (err1) {
-                  res.json({ news: [] });
-                } else {
-                  res.json({ news });
-                }
-              });
-          }
-        });
-      } else {
-        res.json({ news: [] });
-      }
-    }
-  });
-}
 export function getNewsVipCategory(req, res) {
   Setting.findOne({ name: 'vipNewsCount' }).exec((err2, count) => {
     if (err2) {
@@ -443,8 +394,82 @@ export function getNewsVipAll(req, res) {
     }
   });
 }
-export function getNews(req, res) {
+// tim` theo topic cua blog
+// tim` theo category
+// tim` theo alias cua news
+// return 404
+export function getNewsOrBlog(req, res) {
+  const page = req.query.page ? req.query.page: 0;
+  Setting.findOne({name: 'newsCount'}).exec((errSetting, max) => {
+    if (errSetting) {
+      res.json({ news: [] });
+    } else {
+      Topic.findOne({ disable: false, alias: req.params.alias }).exec((errTopic, topic) => {
+        if (errTopic) {
 
+        } else {
+          if (topic) {
+            News.find(
+              { topic: mongoose.Types.ObjectId(topic._id), approved: true, type: 'blog' },
+              {},
+              { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
+            )
+              .populate('topic', 'title alias')
+              .populate('city', 'name')
+              .populate('keywords', 'title alias')
+              .exec((err1, blogs) => {
+                if (err1) {
+                  res.json({ blogs: [] });
+                } else {
+                  res.json({ blogs });
+                }
+              });
+          } else {
+            Category.findOne({ disable: false, alias: req.params.alias }).exec((errTopic, category) => {
+              if (errTopic) {
+
+              } else {
+                if (category) {
+                  News.find(
+                    { category: mongoose.Types.ObjectId(category._id), approved: true, vipAll: false, vipCategory: false, type: 'news' },
+                    {},
+                    { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
+                  )
+                    .sort({ dateCreated: -1 })
+                    .populate('category', 'title alias')
+                    .populate('city', 'name')
+                    .exec((err1, news) => {
+                      if (err1) {
+                        res.json({ news: [] });
+                      } else {
+                        res.json({ news });
+                      }
+                    });
+                } else {
+                  News.findOne({alias: { $regex: req.params.alias, $options: 'i' }, approved: true,})
+                    .populate('category', 'title alias')
+                    .populate('topic', 'title alias')
+                    .populate('keywords', 'title alias')
+                    .populate('city', 'name')
+                    .exec((err, news) => {
+                      if (err) {
+                        res.json({ news: 'error' });
+                      } else {
+                        if (news) {
+                          res.json({ news });
+                        } else {
+                          res.json({ news: '404' });
+                        }
+                      }
+                    });
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+  });
 }
 export function getNews2(req, res) {
   const searchString = req.query.searchString ? req.query.searchString : '';
@@ -678,40 +703,7 @@ export function getNewsByCity(req, res) {
     }
   });
 }
-export function getBlogs(req, res) {
-  News
-    .aggregate([
-      {$match:
-        {
-          approved: true,
-          type: 'blog',
-        }
-      },
-      {$sort:{"dateCreated":-1}},
-      {
-        $lookup: {
-          "from": "topics",
-          "localField": "topic",
-          "foreignField": "_id",
-          "as": "topic"
-        }
-      },
-      {$unwind: '$topic'},
-      {$group:{"_id":"$topic", "news":{$first:"$$ROOT"}}},
-      {$project:{"_id":"$form._id", "news":"$news", }},
-    ])
-    .exec((err, blogs) => {
-      if (err) {
-        res.json({blogs: []});
-      } else {
-        const arr = [];
-        blogs.map((newss) => {
-          arr.push(newss.news);
-        });
-        res.json({ blogs: arr });
-      }
-    });
-}
+
 export function getRelated(req, res) {
   Setting.findOne({name: 'relatedNewsCount'}).exec((err2, max) => {
     if (err2) {
@@ -775,51 +767,6 @@ export function getBlogByUserId(req, res) {
       res.json({ blogs: [] });
     } else {
       res.json({ blogs });
-    }
-  });
-}
-export function getBlogByAlias(req, res) {
-  News.findOne({alias: { $regex: req.params.alias, $options: 'i' }, approved: true, type: 'blog'})
-    .populate('category', 'title alias')
-    .populate('topic', 'title alias')
-    .populate('city', 'name')
-    .exec((err, blog) => {
-      if (err) {
-        res.json({blog: 'error'});
-      } else {
-        if (blog) {
-          res.json({blog});
-        } else {
-          res.json({blog: '404'});
-        }
-      }
-    });
-}
-export function getBlogByTopic(req, res) {
-  const page = (req.query.page && req.query.page !== '') ? req.query.page : 0;
-  Topic.findOne({ alias: { $regex: req.params.topic, $options: 'i' }, disable: false }).exec((err, topic) => {
-    if (err) {
-      res.json({ blogs: [] });
-    } else {
-      if (topic) {
-        News.find(
-          { topic: mongoose.Types.ObjectId(topic._id), approved: true, vipAll: false, vipCategory: false, type: 'blog' },
-          {},
-          { skip: 10 * page, limit: 10, sort: { dateCreated: -1 } }
-        )
-          .populate('category', 'title alias')
-          .populate('topic', 'title alias')
-          .populate('city', 'name')
-          .exec((err1, blogs) => {
-            if (err1) {
-              res.json({ blogs: [] });
-            } else {
-              res.json({ blogs });
-            }
-          });
-      } else {
-        res.json({ blogs: [] });
-      }
     }
   });
 }
