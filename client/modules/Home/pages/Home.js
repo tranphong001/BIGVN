@@ -31,9 +31,8 @@ class Home extends Component {
     const params = this.props.params;
     if (params.hasOwnProperty('alias')) {
       this.fetchNews(params.alias.toLowerCase(), '');
-      this.setState({ oldParams: params });
     } else {
-      this.fetchNews(params.alias.toLowerCase(), '');
+      this.fetchNews('', '');
     }
   }
   componentWillReceiveProps(nextProps) {

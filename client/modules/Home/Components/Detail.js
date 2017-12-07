@@ -13,8 +13,19 @@ import NotFound from '../../NotFound/NotFound';
 import CircularProgress from 'material-ui/CircularProgress';
 import dateFormat from 'dateformat';
 import { Breadcrumb } from 'react-bootstrap';
+import Chip from 'material-ui/Chip';
 
 import Related from './Related';
+
+const stylesChip = {
+  chip: {
+    margin: 4,
+  },
+  wrapper: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+};
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -66,9 +77,6 @@ class Detail extends Component {
     info.imageDirectories.map((dir) => {
       imgArr.push({ original: `/photo/${dir}`, thumbnail: `/photo/${dir}` });
     });
-    // if (info.type === 'blog') {
-    //   this.props.dispatch(setVisibleBlog(true));
-    // }
     const r4 = this.props.banners['r4'];
     const r5 = this.props.banners['r5'];
     return (
@@ -154,7 +162,25 @@ class Detail extends Component {
             </div>
             ) : ''
         }
+        <div style={stylesChip.wrapper}>
+          {
+            this.props.news.keywords.map((k, index) => (
+              <Chip
+                key={`${index}Chip`}
+                style={stylesChip.chip}
+              >
+                {k.title}
+              </Chip>
+            ))
+          }
+        </div>
         <hr style={{ marginTop: '5px', marginBottom: '5px'}} />
+        <div>
+          {this.props.news.summary}
+        </div>
+        <div>
+          từ khóa 1
+        </div>
         <div
           style={{
             textAlign: 'justify',
@@ -164,6 +190,12 @@ class Detail extends Component {
           className={styles.contentDiv}
           dangerouslySetInnerHTML={{ __html: info.content }}
         />
+        <div>
+          {this.props.news.ending}
+        </div>
+        <div>
+          từ khóa 2
+        </div>
         <div style={{ display: 'flex' }} className={styles.advertiseInDetail}>
         {
           (r4 && r4.hasOwnProperty('name')) ? (
@@ -200,7 +232,11 @@ class Detail extends Component {
             ) : ''
         }
         </div>
-        <Related alias={this.props.alias} />
+        {
+          (this.props.news.type === 'news') ? (
+            <Related />
+          ) : ''
+        }
       </div>
     );
   }
@@ -222,7 +258,6 @@ Detail.propTypes = {
     PropTypes.string,
     PropTypes.object
   ]).isRequired,
-  alias: PropTypes.string.isRequired,
   serverTime: PropTypes.number.isRequired,
 };
 

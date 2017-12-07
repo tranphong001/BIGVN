@@ -23,6 +23,7 @@ class DangBlogPages extends Component {
       title: '',
       content: '',
       summary: '',
+      ending: '',
       metaKeyword: '',
       metaDescription: '',
 
@@ -68,6 +69,11 @@ class DangBlogPages extends Component {
       metaKeyword: evt.target.value,
     });
   };
+  onEnding = (evt) => {
+    this.setState({
+      ending: evt.target.value,
+    });
+  };
   onChange = (evt) => {
     const newContent = evt.editor.getData();
     this.setState({
@@ -91,6 +97,7 @@ class DangBlogPages extends Component {
         type: 'blog',
         title: this.state.title,
         summary: this.state.summary,
+        ending: this.state.ending,
         metaKeyword: this.state.metaKeyword,
         metaDescription: this.state.metaDescription,
         content: this.state.content,
@@ -98,7 +105,6 @@ class DangBlogPages extends Component {
         thumbnail: this.state.thumbnail,
         keywords: this.state.tags,
       };
-      console.log(blog);
       this.setState({ isSubmitting: true });
       this.props.dispatch(postNews(blog)).then((res) => {
         this.setState({ isSubmitting: false });
@@ -156,7 +162,6 @@ class DangBlogPages extends Component {
     this.setState({ tags });
   };
   render() {
-    console.log(this.state.tags);
     return (
       <div>
         <div className="panel panel-default col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
@@ -189,7 +194,7 @@ class DangBlogPages extends Component {
               <div className="form-group">
                 <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Meta Keyword</label>
                 <div className="col-sm-9">
-                  <textarea rows="4" className="form-control" type="text" value={this.state.summary} onChange={this.onChange2} />
+                  <textarea rows="4" className="form-control" type="text" value={this.state.metaKeyword} onChange={this.onMetaKeyword} />
                 </div>
               </div>
 
@@ -203,7 +208,7 @@ class DangBlogPages extends Component {
               <div className="form-group">
                 <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Đoạn mô tả ngắn</label>
                 <div className="col-sm-9">
-                  <textarea rows="4" className="form-control" type="text" value={this.state.metaKeyword} onChange={this.onMetaKeyword} />
+                  <textarea rows="4" className="form-control" type="text" value={this.state.summary} onChange={this.onChange2} />
                 </div>
               </div>
 
@@ -215,6 +220,13 @@ class DangBlogPages extends Component {
                     content={this.state.content}
                     events={{ change: this.onChange, blur: () => {}, afterPaste: () => {} }}
                   />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="col-sm-3 control-label text-left" style={{ textAlign: 'left', fontSize: '11pt' }}>Kết bài</label>
+                <div className="col-sm-9">
+                  <textarea rows="4" className="form-control" type="text" value={this.state.ending} onChange={this.onEnding} />
                 </div>
               </div>
 

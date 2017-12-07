@@ -25,6 +25,7 @@ const newsSchema = new Schema({
   content: { type: 'String', required: true, maxLength: [2000, 'Độ dài vượt quá 2000 từ.'] },
   summary: { type: 'String', default: '', maxLength: [200, 'Độ dài vượt quá 200 từ.'] },
   comment: { type: 'String', default: '' },
+  ending: { type: 'String', default: '', maxLength: [200, 'Độ dài vượt quá 200 từ.'] },
   imageDirectories: [
     { type: 'String', required: true },
   ],
