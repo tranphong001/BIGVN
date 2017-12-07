@@ -7,6 +7,8 @@ const initialState = {
   newsVipList: [],
   news: {},
   related: [],
+  relatedKeyword1: [],
+  relatedKeyword2: [],
   blog: {},
   loading: false,
 
@@ -16,6 +18,10 @@ const initialState = {
 
 const HomeReducer = (state = initialState, action) => {
   switch (action.type) {
+    case ACTIONS.ADD_RELATED_KEYWORD_1:
+      return { ...state, relatedKeyword1: action.news };
+    case ACTIONS.ADD_RELATED_KEYWORD_2:
+      return { ...state, relatedKeyword1: action.news };
     case ACTIONS.SET_CURRENT_PAGE:
       return { ...state, currentPage: action.currentPage };
     case ACTIONS.SET_MAX_PAGE:
@@ -50,5 +56,7 @@ export const getNewsVipList = state => state.home.newsVipList;
 export const getNews = state => state.home.news;
 export const getBlog = state => state.home.blog;
 export const getLoading = state => state.home.loading;
+export const getRelatedKeyword1 = state => state.home.relatedKeyword1;
+export const getRelatedKeyword2 = state => state.home.relatedKeyword2;
 
 export default HomeReducer;

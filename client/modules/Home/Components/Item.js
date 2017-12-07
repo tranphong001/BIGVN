@@ -29,6 +29,15 @@ class Item extends Component {
       this.isNotOnFrame = true;
     }
   };
+  onCategoryTop = (info) => {
+    this.isNotOnFrame = false;
+    this.props.dispatch(setMenuHeader(info.title));
+    this.props.dispatch(setPageHeader(info.title));
+    this.context.router.push(`/${info.alias}`);
+  };
+  capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
   renderTime = (recent) => {
     if (recent.getYear() - 70 > 0) return `${recent.getYear() - 70} năm trước`;
     if (recent.getMonth() > 0) return `${recent.getMonth()} tháng trước`;
@@ -36,15 +45,6 @@ class Item extends Component {
     if (recent.getHours() > 0) return `${recent.getHours()} giờ trước`;
     if (recent.getMinutes() > 0) return `${recent.getHours()} phút trước`;
     return `${recent.getSeconds()} giây trước`;
-  };
-  capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
-  onCategoryTop = (info) => {
-    this.isNotOnFrame = false;
-    this.props.dispatch(setMenuHeader(info.title));
-    this.props.dispatch(setPageHeader(info.title));
-    this.context.router.push(`/${info.alias}`);
   };
   onCityTop = (city) => {
     this.isNotOnFrame = false;

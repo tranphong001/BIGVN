@@ -11,6 +11,8 @@ export const ACTIONS = {
   ADD_BLOG_LIST: 'ADD_BLOG_LIST',
   ADD_BLOG: 'ADD_BLOG',
   SET_RELATED: 'SET_RELATED',
+  ADD_RELATED_KEYWORD_1: 'ADD_RELATED_KEYWORD_1',
+  ADD_RELATED_KEYWORD_2: 'ADD_RELATED_KEYWORD_2',
 };
 
 export function setMaxPage(maxPage) {
@@ -49,16 +51,50 @@ export function addNews(news) {
     news,
   };
 }
+export function addRelatedKeyword1(news) {
+  return {
+    type: ACTIONS.ADD_RELATED_KEYWORD_1,
+    news,
+  };
+}
+export function addRelatedKeyword2(news) {
+  return {
+    type: ACTIONS.ADD_RELATED_KEYWORD_2,
+    news,
+  };
+}
+export function setRelated(news) {
+  return {
+    type: ACTIONS.SET_RELATED,
+    news,
+  };
+}
+export function fetchRelatedNews(alias) {
+  return (dispatch) => {
+    return callApi(`news/related/${alias}`, 'get', '').then(res => {
+      dispatch(setRelated(res.news));
+      return res;
+    });
+  }
+}
 export function fetchNews(alias, url) {
   return (dispatch) => {
     return callApi(`news/get/${alias}${url}`, 'get', '').then(res => {
-      if (res.type === 'list') {
+      if (res.mode === 'list') {
         dispatch(setMaxPage(res.maxPage));
         dispatch(addNewsList(res.news));
       }
-      if (res.type === 'detail') {
+      if (res.mode === 'detail') {
+        console.log(res);
         dispatch(setMaxPage(res.maxPage));
         dispatch(addNews(res.news));
+        if (res.type === 'blog') {
+          dispatch(addRelatedKeyword1(res.related1));
+          dispatch(addRelatedKeyword2(res.related2));
+        }
+        if (res.mode === 'news') {
+          dispatch(setRelated(res.related));
+        }
       }
       return res;
     });
@@ -94,18 +130,4 @@ export function fetchNewsByCategoryVip(category) {
   };
 }
 
-export function setRelated(news) {
-  return {
-    type: ACTIONS.SET_RELATED,
-    news,
-  };
-}
-export function fetchRelatedNews(alias) {
-  return (dispatch) => {
-    return callApi(`news/related/${alias}`, 'get', '').then(res => {
-      dispatch(setRelated(res.news));
-      return res;
-    });
-  }
-}
 

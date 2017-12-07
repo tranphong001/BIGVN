@@ -402,11 +402,11 @@ export function getNewsOrBlog(req, res) {
   const page = req.query.page ? req.query.page : 0;
   Setting.findOne({ name: 'newsCount' }).exec((errSetting, max) => {
     if (errSetting) {
-      res.json({ type: 'list', news: [], maxPage: 1 });
+      res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
     } else {
       Topic.findOne({ disable: false, alias: req.params.alias }).exec((errTopic, topic) => {
         if (errTopic) {
-          res.json({ type: 'list', news: [], maxPage: 1 });
+          res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
         } else {
           if (topic) {
             News.find(
@@ -419,7 +419,7 @@ export function getNewsOrBlog(req, res) {
               .populate('keywords', 'title alias')
               .exec((err1, news) => {
                 if (err1) {
-                  res.json({ type: 'list', news: [], maxPage: 1 });
+                  res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                 } else {
                   News.find(
                     { topic: mongoose.Types.ObjectId(topic._id), approved: true, type: 'blog' },
@@ -427,12 +427,12 @@ export function getNewsOrBlog(req, res) {
                     { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
                   ).count().exec((errBlog2, count) => {
                     if (errBlog2) {
-                      res.json({ type: 'list', news: [], maxPage: 1 });
+                      res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                     } else {
                       const temp1 = count / Number(max.value);
                       const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
                       const length = Math.ceil(temp1 + temp2);
-                      res.json({ type: 'list', news, maxPage: (count !== 0) ? length : 0 });
+                      res.json({ mode: 'list', type: 'blog', news, maxPage: (count !== 0) ? length : 0 });
                     }
                   });
                 }
@@ -440,7 +440,7 @@ export function getNewsOrBlog(req, res) {
           } else {
             Category.findOne({ disable: false, alias: req.params.alias }).exec((errCategory, category) => {
               if (errCategory) {
-                res.json({ type: 'list', news: [], maxPage: 1 });
+                res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
               } else {
                 if (category) {
                   News.find(
@@ -453,7 +453,7 @@ export function getNewsOrBlog(req, res) {
                     .populate('city', 'name')
                     .exec((err1, news) => {
                       if (err1) {
-                        res.json({ news: [] });
+                        res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                       } else {
                         News.find(
                           { category: mongoose.Types.ObjectId(category._id), approved: true, vipAll: false, vipCategory: false, type: 'news' },
@@ -461,20 +461,20 @@ export function getNewsOrBlog(req, res) {
                           { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
                         ).count().exec((errCategory2, count) => {
                           if (errCategory2) {
-                            res.json({ news: [] });
+                            res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                           } else {
                             const temp1 = count / Number(max.value);
                             const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
                             const length = Math.ceil(temp1 + temp2);
-                            res.json({ type: 'list', news, maxPage: (count !== 0) ? length : 0 });
+                            res.json({ mode: 'list', type: 'news', news, maxPage: (count !== 0) ? length : 0 });
                           }
                         });
                       }
                     });
                 } else {
-                  Keyword.findOne({ disable: false, alias: req.params.alias }).exec((errKeyword, keyword) => {
+                  Keyword.findOne({ alias: req.params.alias }).exec((errKeyword, keyword) => {
                     if (errKeyword) {
-
+                      res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                     } else {
                       if (keyword) {
                         News.find(
@@ -488,7 +488,7 @@ export function getNewsOrBlog(req, res) {
                           .populate('keywords', 'title alias')
                           .exec((err1, news) => {
                             if (err1) {
-                              res.json({ type: 'list', news: [], maxPage: 1 });
+                              res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                             } else {
                               News.find(
                                 { keywords: mongoose.Types.ObjectId(keyword._id), approved: true, type: 'blog' },
@@ -496,12 +496,12 @@ export function getNewsOrBlog(req, res) {
                                 { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
                               ).count().exec((errKeyword2, count) => {
                                 if (errKeyword2) {
-                                  res.json({ type: 'list', news: [], maxPage: 1 });
+                                  res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                                 } else {
                                   const temp1 = count / Number(max.value);
                                   const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
                                   const length = Math.ceil(temp1 + temp2);
-                                  res.json({ type: 'list', news, maxPage: (count !== 0) ? length : 0 });
+                                  res.json({ mode: 'list', type: 'blog', news, maxPage: (count !== 0) ? length : 0 });
                                 }
                               });
                             }
@@ -517,9 +517,43 @@ export function getNewsOrBlog(req, res) {
                               res.json({ news: 'error' });
                             } else {
                               if (news) {
-                                res.json({ type: 'detail', news, maxPage: 1 });
+                                if (news.type === 'blog') {
+                                  const kw1 = news.keywords[0];
+                                  const kw2 = news.keywords[1];
+                                  console.log(news.keywords[2]);
+                                  News.find({ approved: true, type: 'blog', keywords: kw1 })
+                                    .populate('topic', 'title alias')
+                                    .populate('keywords', 'title alias')
+                                    .populate('city', 'name')
+                                    .exec((errR1, related1) => {
+                                    if (errR1) {
+                                      res.json({ mode: 'detail', type: '', news, maxPage: 1 });
+                                    } else {
+                                      News.find({ approved: true, type: 'blog', keywords: kw2 })
+                                        .populate('topic', 'title alias')
+                                        .populate('keywords', 'title alias')
+                                        .populate('city', 'name')
+                                        .exec((errR2, related2) => {
+                                        if (errR2) {
+                                          res.json({ mode: 'detail', type: '', news, maxPage: 1 });
+                                        } else {
+                                          res.json({
+                                            mode: 'detail',
+                                            type: 'blog',
+                                            news,
+                                            maxPage: 1,
+                                            related1,
+                                            related2,
+                                          });
+                                        }
+                                      });
+                                    }
+                                  });
+                                } else {
+                                  res.json({ mode: 'detail', type: '', news, maxPage: 1 });
+                                }
                               } else {
-                                res.json({ type: 'detail', news: '404', maxPage: 1 });
+                                res.json({ mode: 'detail', type: 'news', news: '404', maxPage: 1 });
                               }
                             }
                           });

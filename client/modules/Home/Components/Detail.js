@@ -5,7 +5,7 @@ import ImageGallery from 'react-image-gallery';
 import style from '../../../../node_modules/react-image-gallery/styles/css/image-gallery.css';
 import numeral from 'numeral';
 import { fetchNewsByAlias } from '../HomeActions';
-import { getNews } from '../HomeReducer';
+import { getNews, getRelatedKeyword1, getRelatedKeyword2 } from '../HomeReducer';
 import styles from '../../../main.css';
 import { getBanners, getServerTime } from '../../App/AppReducer';
 import { setVisibleBlog, setMenuHeader, setPageHeader, setSearchCity } from '../../App/AppActions';
@@ -14,8 +14,8 @@ import CircularProgress from 'material-ui/CircularProgress';
 import dateFormat from 'dateformat';
 import { Breadcrumb } from 'react-bootstrap';
 import Chip from 'material-ui/Chip';
-
 import Related from './Related';
+import RelatedKeyword from './RelatedKeyword';
 
 const stylesChip = {
   chip: {
@@ -59,6 +59,9 @@ class Detail extends Component {
     this.props.dispatch(setSearchCity(city._id));
     this.props.dispatch(setPageHeader(city.name.toUpperCase()));
     this.context.router.push('/');
+  };
+  onKeyword = (alias) => {
+    this.context.router.push(`/${alias}`);
   };
   render() {
     const info = this.props.news;
@@ -168,6 +171,7 @@ class Detail extends Component {
               <Chip
                 key={`${index}Chip`}
                 style={stylesChip.chip}
+                onClick={() => this.onKeyword(k.alias)}
               >
                 {k.title}
               </Chip>
@@ -179,7 +183,7 @@ class Detail extends Component {
           {this.props.news.summary}
         </div>
         <div>
-          từ khóa 1
+          <RelatedKeyword related={this.props.relatedKeyword1} />
         </div>
         <div
           style={{
@@ -194,7 +198,7 @@ class Detail extends Component {
           {this.props.news.ending}
         </div>
         <div>
-          từ khóa 2
+          <RelatedKeyword related={this.props.relatedKeyword2} />
         </div>
         <div style={{ display: 'flex' }} className={styles.advertiseInDetail}>
         {
@@ -248,10 +252,14 @@ function mapStateToProps(state) {
     banners: getBanners(state),
     news: getNews(state),
     serverTime: getServerTime(state),
+    relatedKeyword1: getRelatedKeyword1(state),
+    relatedKeyword2: getRelatedKeyword2(state),
   };
 }
 
 Detail.propTypes = {
+  relatedKeyword1: PropTypes.array.isRequired,
+  relatedKeyword2: PropTypes.array.isRequired,
   dispatch: PropTypes.func.isRequired,
   banners: PropTypes.object.isRequired,
   news: PropTypes.oneOfType([

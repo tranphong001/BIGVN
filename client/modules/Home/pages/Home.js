@@ -21,7 +21,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      type: 'none',
+      mode: 'none',
       oldSearchCity: '',
 
       oldParams: {},
@@ -54,22 +54,21 @@ class Home extends Component {
   fetchNews = (alias, url) => {
     this.reset();
     this.props.dispatch(fetchNews(alias, url)).then((res) => {
-      console.log(res);
-      this.setState({ type: res.type });
+      this.setState({ mode: res.mode });
     });
   };
   render() {
     return (
       <div className="container">
           {
-            (this.state.type === 'list') ? (
+            (this.state.mode === 'list') ? (
               <div className={`${grid.contentWidth} col-xs-12`}>
                 <List alias={this.state.alias} />
               </div>
             ) : ''
           }
           {
-            (this.state.type === 'detail') ? (
+            (this.state.mode === 'detail') ? (
               <div className={`${grid.contentWidthDetail} col-xs-12`}>
                 <Detail alias={this.state.alias} />
               </div>

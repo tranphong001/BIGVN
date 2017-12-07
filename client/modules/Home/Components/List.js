@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Item from './Item';
-import {getNewsList, getLoading, getNewsVipList, getCurrentPage, getMaxPage } from '../HomeReducer';
 import { fetchVipCategory, fetchNews, addVipCategory } from'../../App/AppActions';
 import { getPageHeader } from'../../App/AppReducer';
 import CircularProgress from 'material-ui/CircularProgress';
 import styles from '../../../main.css';
 import grid from '../../../grid.css';
 import { Pagination } from 'react-bootstrap';
-import {setCurrentPage} from "../HomeActions";
+import { setCurrentPage } from '../HomeActions';
+import { getNewsList, getLoading, getNewsVipList, getCurrentPage, getMaxPage } from '../HomeReducer';
 
 class List extends Component {
   constructor(props) {
