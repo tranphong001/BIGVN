@@ -16,13 +16,13 @@ export const ACTIONS = {
 export function setMaxPage(maxPage) {
   return {
     type: ACTIONS.SET_MAX_PAGE,
-    maxPage
+    maxPage,
   };
 }
 export function setCurrentPage(currentPage) {
   return {
     type: ACTIONS.SET_CURRENT_PAGE,
-    currentPage
+    currentPage,
   };
 }
 
@@ -34,35 +34,37 @@ export function setLoading() {
 export function addNewsList(news) {
   return {
     type: ACTIONS.ADD_NEWS_LIST,
-    news
+    news,
   };
 }
 export function addNewsVipList(news) {
   return {
     type: ACTIONS.ADD_NEWS_VIP_LIST,
-    news
+    news,
   };
 }
 export function addNews(news) {
   return {
     type: ACTIONS.ADD_NEWS,
-    news
+    news,
   };
 }
-export function fetchNewsByAlias(alias) {
+export function fetchNews(alias, url) {
   return (dispatch) => {
-    return callApi(`news/alias/${alias}`, 'get', '').then(res => {
-      dispatch(addNews(res.news));
+    return callApi(`news/get/${alias}${url}`, 'get', '').then(res => {
+      if (res.type === 'list') {
+        dispatch(setMaxPage(res.maxPage));
+        dispatch(addNewsList(res.news));
+      }
+      if (res.type === 'detail') {
+        dispatch(setMaxPage(res.maxPage));
+        dispatch(addNews(res.news));
+      }
+      return res;
     });
-  }
-};
-export function fetchNews() {
-  return (dispatch) => {
-    return callApi('news', 'get', '').then(res => {
-      dispatch(addNewsList(res.news));
-    });
-  }
-};
+  };
+}
+
 export function searchNews(url) {
   return (dispatch) => {
     return callApi(`search/news${url}`, 'get', '').then(res => {
@@ -72,7 +74,8 @@ export function searchNews(url) {
       dispatch(setCurrentPage(1));
     });
   }
-};
+}
+
 export function searchNewsByCity(url) {
   return (dispatch) => {
     return callApi(`searchbycity/${url}`, 'get', '').then(res => {
@@ -81,26 +84,20 @@ export function searchNewsByCity(url) {
       dispatch(setCurrentPage(1));
     });
   }
-};
+}
 
-export function fetchNewsByCategory(category, page) {
-  return (dispatch) => {
-    return callApi(`news/category/${category}?page=${page}`, 'get', '').then(res => {
-      dispatch(addNewsList(res.news))
-    });
-  }
-};
 export function fetchNewsByCategoryVip(category) {
   return (dispatch) => {
     return callApi(`news/vip/category/${category}`, 'get', '').then(res => {
       dispatch(addNewsVipList(res.news))
     });
-  }
-};
+  };
+}
+
 export function setRelated(news) {
   return {
     type: ACTIONS.SET_RELATED,
-    news
+    news,
   };
 }
 export function fetchRelatedNews(alias) {
@@ -110,39 +107,5 @@ export function fetchRelatedNews(alias) {
       return res;
     });
   }
-};
-
-
-export function addBlogList(blogs) {
-  return {
-    type: ACTIONS.ADD_BLOG_LIST,
-    blogs
-  };
 }
-export function addBlog(blog) {
-  return {
-    type: ACTIONS.ADD_BLOG,
-    blog
-  };
-}
-export function fetchBlogByAlias(alias) {
-  return (dispatch) => {
-    return callApi(`blog/alias/${alias}`, 'get', '').then(res => {
-      dispatch(addBlog(res.blog))
-    });
-  }
-};
-export function fetchBlogByTopic(topic, page) {
-  return (dispatch) => {
-    return callApi(`blogs/topic/${topic}?page=${page}`, 'get', '').then(res => {
-      dispatch(addNewsList(res.blogs));
-    });
-  }
-};
-export function fetchBlog() {
-  return (dispatch) => {
-    return callApi('blogs', 'get', '').then(res => {
-      dispatch(addNewsList(res.blogs))
-    });
-  }
-};
+

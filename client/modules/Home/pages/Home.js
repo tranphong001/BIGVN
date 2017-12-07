@@ -14,7 +14,7 @@ import grid from '../../../grid.css';
 import List from '../Components/List';
 import style from './Home.css';
 import CircularProgress from 'material-ui/CircularProgress';
-import { searchNewsByCity, searchNews, setLoading, setRelated, fetchRelatedNews, fetchBlog, fetchNewsByAlias, fetchNewsByCategory, addNewsList, addBlogList, addNews, fetchNewsByCategoryVip, addNewsVipList, fetchNews, fetchBlogByAlias, fetchBlogByTopic } from '../HomeActions';
+import { searchNewsByCity, searchNews, setLoading, setRelated, fetchRelatedNews, fetchBlog, addNewsList, addBlogList, addNews, fetchNewsByCategoryVip, addNewsVipList, fetchNews, fetchBlogByAlias, fetchBlogByTopic } from '../HomeActions';
 import { getCurrentPage } from '../HomeReducer';
 
 class Home extends Component {
@@ -28,16 +28,36 @@ class Home extends Component {
     };
   }
   componentWillMount() {
+    const params = this.props.params;
+    if (params.hasOwnProperty('alias')) {
+      this.fetchNews(params.alias.toLowerCase(), '');
+      this.setState({ oldParams: params });
+    } else {
+      this.fetchNews(params.alias.toLowerCase(), '');
+    }
   }
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+    if (JSON.stringify(nextProps.params) !== JSON.stringify(this.state.oldParams) &&
+        this.props.categories.length > 0 &&
+        this.props.topics.length > 0
+    ) {
+      console.log(nextProps.params.alias);
+      this.fetchNews(nextProps.params.alias, '');
+      this.setState({ oldParams: nextProps.params });
+    }
   }
   reset = () => {
+    this.props.dispatch(addNews({}));
     this.props.dispatch(setRelated([]));
     this.props.dispatch(addNewsList([]));
-    this.props.dispatch(addBlogList([]));
     this.props.dispatch(addNewsVipList([]));
-    this.props.dispatch(addNews({}));
+  };
+  fetchNews = (alias, url) => {
+    this.reset();
+    this.props.dispatch(fetchNews(alias, url)).then((res) => {
+      console.log(res);
+      this.setState({ type: res.type });
+    });
   };
   render() {
     return (

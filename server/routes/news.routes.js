@@ -16,8 +16,6 @@ router.route('/news/vip/all').get(NewsController.getNewsVipAll);
 
 router.route('/blogs/user/:id').get(NewsController.getBlogByUserId);
 
-
-
-// router.route('/:id').get(NewsController.getAlias);
+router.route('/:id').get(NewsController.getAlias);
 
 export default router;

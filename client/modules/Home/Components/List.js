@@ -29,13 +29,6 @@ class List extends Component {
         </div>
         <div className="col-md-12 col-xs-12" style={{ paddingLeft: '0', paddingRight: '0', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           {
-            this.props.loading ? (
-              <div style={{ paddingTop: '20px' }}>
-                <CircularProgress  size={160} thickness={5} />
-              </div>
-              ) : ''
-          }
-          {
             (this.props.newsVipList.length > 0 ) ? (
               this.props.newsVipList.map((info, index) => (
                 <div className={grid.itemList} key={`${index}VipCate`}>

@@ -309,17 +309,17 @@ export function createNews(req, res) {
   }
 }
 export function getAlias(req, res) {
-  console.log('abcdef');
+  res.json({});
 }
 
 export function getNewsVipCategory(req, res) {
   Setting.findOne({ name: 'vipNewsCount' }).exec((err2, count) => {
     if (err2) {
-      res.json({news: []});
+      res.json({ news: [] });
     } else {
       Category.findOne({alias: req.params.alias}).exec((err, category) => {
         if (err) {
-          res.json({news: []});
+          res.json({ news: [] });
         } else {
           if (category) {
             News.find({
@@ -334,15 +334,15 @@ export function getNewsVipCategory(req, res) {
               .limit(Number(count.value))
               .exec((err, news) => {
               if (err) {
-                res.json({news: []});
+                res.json({ news: [] });
               } else {
-                res.json({news});
+                res.json({ news });
               }
             });
           } else {
-            News.findOne({alias: req.params.alias, approved: true}).exec((err2, news) => {
+            News.findOne({ alias: req.params.alias, approved: true}).exec((err2, news) => {
               if (err2) {
-                res.json({news: []});
+                res.json({ news: [] });
               } else {
                 if (news) {
                   News
@@ -399,14 +399,14 @@ export function getNewsVipAll(req, res) {
 // tim` theo alias cua news
 // return 404
 export function getNewsOrBlog(req, res) {
-  const page = req.query.page ? req.query.page: 0;
-  Setting.findOne({name: 'newsCount'}).exec((errSetting, max) => {
+  const page = req.query.page ? req.query.page : 0;
+  Setting.findOne({ name: 'newsCount' }).exec((errSetting, max) => {
     if (errSetting) {
-      res.json({ news: [] });
+      res.json({ type: 'list', news: [], maxPage: 1 });
     } else {
       Topic.findOne({ disable: false, alias: req.params.alias }).exec((errTopic, topic) => {
         if (errTopic) {
-
+          res.json({ type: 'list', news: [], maxPage: 1 });
         } else {
           if (topic) {
             News.find(
@@ -417,19 +417,33 @@ export function getNewsOrBlog(req, res) {
               .populate('topic', 'title alias')
               .populate('city', 'name')
               .populate('keywords', 'title alias')
-              .exec((err1, blogs) => {
+              .exec((err1, news) => {
                 if (err1) {
-                  res.json({ blogs: [] });
+                  res.json({ type: 'list', news: [], maxPage: 1 });
                 } else {
-                  res.json({ blogs });
+                  News.find(
+                    { topic: mongoose.Types.ObjectId(topic._id), approved: true, type: 'blog' },
+                    {},
+                    { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
+                  ).count().exec((errBlog2, count) => {
+                    if (errBlog2) {
+                      res.json({ news: [] });
+                    } else {
+                      const temp1 = count / Number(max.value);
+                      const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
+                      const length = Math.ceil(temp1 + temp2);
+                      res.json({ type: 'list', news, maxPage: (count !== 0) ? length : 0 });
+                    }
+                  });
                 }
               });
           } else {
-            Category.findOne({ disable: false, alias: req.params.alias }).exec((errTopic, category) => {
-              if (errTopic) {
-
+            Category.findOne({ disable: false, alias: req.params.alias }).exec((errCategory, category) => {
+              if (errCategory) {
+                res.json({ type: 'list', news: [], maxPage: 1 });
               } else {
                 if (category) {
+                  console.log(category);
                   News.find(
                     { category: mongoose.Types.ObjectId(category._id), approved: true, vipAll: false, vipCategory: false, type: 'news' },
                     {},
@@ -442,11 +456,24 @@ export function getNewsOrBlog(req, res) {
                       if (err1) {
                         res.json({ news: [] });
                       } else {
-                        res.json({ news });
+                        News.find(
+                          { category: mongoose.Types.ObjectId(category._id), approved: true, vipAll: false, vipCategory: false, type: 'news' },
+                          {},
+                          { skip: Number(max.value) * page, limit: Number(max.value), sort: { dateCreated: -1 } }
+                        ).count().exec((errCategory2, count) => {
+                          if (errCategory2) {
+                            res.json({ news: [] });
+                          } else {
+                            const temp1 = count / Number(max.value);
+                            const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
+                            const length = Math.ceil(temp1 + temp2);
+                            res.json({ type: 'list', news, maxPage: (count !== 0) ? length : 0 });
+                          }
+                        });
                       }
                     });
                 } else {
-                  News.findOne({alias: { $regex: req.params.alias, $options: 'i' }, approved: true,})
+                  News.findOne({ alias: { $regex: req.params.alias, $options: 'i' }, approved: true })
                     .populate('category', 'title alias')
                     .populate('topic', 'title alias')
                     .populate('keywords', 'title alias')
@@ -456,9 +483,9 @@ export function getNewsOrBlog(req, res) {
                         res.json({ news: 'error' });
                       } else {
                         if (news) {
-                          res.json({ news });
+                          res.json({ type: 'detail', news, maxPage: 1 });
                         } else {
-                          res.json({ news: '404' });
+                          res.json({ type: 'detail', news: '404', maxPage: 1 });
                         }
                       }
                     });
