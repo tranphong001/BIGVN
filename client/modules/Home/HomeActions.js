@@ -97,6 +97,9 @@ export function fetchNews(alias, url) {
       if (res.mode === 'list') {
         dispatch(setMaxPage(res.maxPage));
         dispatch(addNewsList(res.news));
+        if (res.type === 'news') {
+          dispatch(addNewsVipList(res.vipCategory));
+        }
       }
       if (res.mode === 'detail') {
         dispatch(setMaxPage(res.maxPage));
@@ -148,7 +151,7 @@ export function searchNews(url) {
       dispatch(setMaxPage(res.count));
       dispatch(setCurrentPage(1));
     });
-  }
+  };
 }
 
 export function searchNewsByCity(url) {
@@ -164,9 +167,7 @@ export function searchNewsByCity(url) {
 export function fetchNewsByCategoryVip(category) {
   return (dispatch) => {
     return callApi(`news/vip/category/${category}`, 'get', '').then(res => {
-      dispatch(addNewsVipList(res.news))
+      dispatch(addNewsVipList(res.news));
     });
   };
 }
-
-

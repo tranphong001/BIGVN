@@ -638,6 +638,7 @@ export function getNewsOrBlog(req, res) {
       });
     return;
   }
+
   Setting.findOne({ name: 'newsCount' }).exec((errSetting, max) => {
     if (errSetting) {
       res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
@@ -701,10 +702,36 @@ export function getNewsOrBlog(req, res) {
                           if (errCategory2) {
                             res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
                           } else {
-                            const temp1 = count / Number(max.value);
-                            const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
-                            const length = Math.ceil(temp1 + temp2);
-                            res.json({ mode: 'list', type: 'news', news, maxPage: (count !== 0) ? length : 0 });
+                            Setting.findOne({ name: 'vipNewsCount' }).exec((err2, vipNewsCount) => {
+                              if (err2) {
+                                res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+                              } else {
+                                News.find(
+                                  {
+                                    category: mongoose.Types.ObjectId(category._id),
+                                    vipCategory: true,
+                                    approved: true,
+                                    type: 'news',
+                                  },
+                                  {},
+                                  { sort: { vipCategory: 1, dateCreated: -1}
+                                  })
+                                  .populate('category', 'title alias')
+                                  .populate('topic', 'title alias')
+                                  .populate('city', 'name')
+                                  .limit(Number(vipNewsCount.value))
+                                  .exec((err, vipCategory) => {
+                                    if (err) {
+                                      res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+                                    } else {
+                                      const temp1 = count / Number(max.value);
+                                      const temp2 = (count % Number(max.value) === 0) ? 1 : 0;
+                                      const length = Math.ceil(temp1 + temp2);
+                                      res.json({ mode: 'list', type: 'news', news, vipCategory, maxPage: (count !== 0) ? length : 0 });
+                                    }
+                                  });
+                              }
+                            });
                           }
                         });
                       }

@@ -69,7 +69,7 @@ class Item extends Component {
         />
 
         <div className={grid.itemContent}>
-          <div className={styles.vipImageItem} style={{ visibility: (info.vip === 'none') ? 'hidden' : 'visible' }}>
+          <div className={styles.vipImageItem} style={{ visibility: (info.vipCategory) ? 'visible' : 'hidden' }}>
             <img role="presentation" src="images/VIP2.png" className={styles.imgthumpVipIcon} />
           </div>
           <div id="title" style={{ paddingLeft: '0', marginTop: '-2px', width: '93%' }}>

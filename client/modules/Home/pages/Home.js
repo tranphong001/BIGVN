@@ -30,8 +30,8 @@ class Home extends Component {
   }
   componentDidMount() {
     const params = this.props.params;
+    const route = this.props.route;
     if (params.hasOwnProperty('alias')) {
-      console.log(this.props.route);
       if (this.props.route.path.indexOf('tag') !== -1) {
         this.fetchNews(params.alias.toLowerCase(), '');
         this.fetchTag(params.alias.toLowerCase(), '');
@@ -39,7 +39,13 @@ class Home extends Component {
         this.fetchNews(params.alias.toLowerCase(), '');
       }
     } else {
-      this.fetchNews('', '');
+      if (route.hasOwnProperty('path') && route.path.indexOf('tag') !== -1) {
+        this.setState({ oldRoute: route });
+        this.fetchTag(params.alias, '');
+      } else {
+        this.fetchNews(params.alias, '');
+        this.setState({ oldParams: params });
+      }
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -51,7 +57,6 @@ class Home extends Component {
         this.props.categories.length > 0 &&
         this.props.topics.length > 0
     ) {
-      console.log(nextProps);
       if (nextProps.route.hasOwnProperty('path') && nextProps.route.path.indexOf('tag') !== -1) {
         this.setState({ oldRoute: nextProps.route });
         this.fetchTag(nextProps.params.alias, '');
