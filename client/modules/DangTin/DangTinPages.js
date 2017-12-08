@@ -157,6 +157,7 @@ class DangTinPages extends Component {
         ward: this.state.ward,
         type: 'news',
         address: this.state.address,
+        keywords: [],
         title: this.state.title,
         price: this.state.price,
         content: this.state.content,
@@ -171,6 +172,7 @@ class DangTinPages extends Component {
       };
       this.setState({ isSubmitting: true });
       this.props.dispatch(postNews(news)).then((res) => {
+        console.log(res);
         this.setState({ isSubmitting: false });
         if (res.news === 'success') {
           this.context.router.push('/');

@@ -257,9 +257,11 @@ export function createNews(req, res) {
               promises.push(writeImage(base64));
             });
             Promise.all(promises).then((imageDirectories) => {
-              reqNews.keywords.map((k) => {
-                promises2.push(addKeyword(k));
-              });
+              if (reqNews.hasOwnProperty('keywords')) {
+                reqNews.keywords.map((k) => {
+                  promises2.push(addKeyword(k));
+                });
+              }
               Promise.all(promises2).then((keywords) => {
                 const alias = KhongDau(reqNews.title).toString().toLowerCase().replace(/[^0-9a-z]/gi, ' ').trim().replace(/ {1,}/g, ' ').replace(/ /g, '-');
                 const titleSearch = KhongDau(reqNews.title.trim()).toString().toLowerCase();
@@ -294,7 +296,6 @@ export function createNews(req, res) {
                   }
                 });
               });
-
             }, (err) => {
               res.json({ news: 'error' });
             });
@@ -451,6 +452,192 @@ export function getTag(req, res) {
 // return 404
 export function getNewsOrBlog(req, res) {
   const page = req.query.page ? req.query.page : 0;
+  const searchString = req.query.searchString ? req.query.searchString : '';
+  const searchCategory = req.query.searchCategory ? req.query.searchCategory: '';
+  const searchCity = req.query.searchCity ? req.query.searchCity: '';
+  const searchPage = req.query.searchPage ? req.query.searchPage : 0;
+  if (req.params.alias === 'undefined') {
+    Setting.findOne({ name: 'newsCount' }).exec((errSetting, max) => {
+      if (errSetting) {
+        res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+      } else {
+        const cates = [];
+        const citys = [];
+        Category.find({}).exec((errCate, categories) => {
+          if (errCate) {
+            res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+          } else {
+            categories.map(cate => cates.push(cate._id));
+            City.find({}).exec((errCity, cities) => {
+              if (errCity) {
+                res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+              } else {
+                cities.map(c => citys.push(c._id));
+                if (searchString === '') {
+                  News
+                    .aggregate([
+                      {
+                        $match: {
+                          approved: true,
+                          type: 'news',
+                          category: { $in: (searchCategory === '') ? cates : [mongoose.Types.ObjectId(searchCategory)] },
+                        },
+                      },
+                      { $sort: { dateCreated: -1 } },
+                      {
+                        $lookup: {
+                          from: 'categories',
+                          localField: 'category',
+                          foreignField: '_id',
+                          as: 'category',
+                        },
+                      },
+                      { $unwind: '$category' },
+                      {
+                        $lookup: {
+                          from: 'cities',
+                          localField: 'city',
+                          foreignField: '_id',
+                          as: 'city',
+                        },
+                      },
+                      { $unwind: '$city'},
+                      { $group: { _id: '$category', news: { $first: '$$ROOT' } } },
+                      { $project: { _id: '$form._id', news: '$news' }},
+                      { $sort: { index: 1, score: -1 } },
+                      {
+                        $group: {
+                          _id: null,
+                          news: { $push: '$news' },
+                          count: { $sum: 1 },
+                        },
+                      },
+                      {
+                        $project: {
+                          news: { $slice: [ '$news', Number(max.value) * Number(searchPage), Number(max.value) ] },
+                          count: '$count',
+                        },
+                      },
+                    ])
+                    .exec((errN, result) => {
+                      if (errN) {
+                        res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+                      } else {
+                        if (result.length > 0) {
+                          const length = result[0].count / Number(max.value) + (result[0].count % Number(max.value) === 0) ? 0 : 1;
+                          res.json({ mode: 'list', type: '', news: result[0].news, maxPage: (result[0].count !== 0) ? length : 0 });
+                        } else {
+                          res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+                        }
+                      }
+                    });
+                } else {
+                  News
+                    .aggregate([
+                      {
+                        $match: {
+                          approved: true,
+                          type: 'news',
+                          titleSearch: { $regex: `^${KhongDau(searchString)}|${KhongDau(searchString)}`, $options: 'i' },
+                        },
+                      },
+                      {
+                        $lookup: {
+                          from: 'cities',
+                          localField: 'city',
+                          foreignField: '_id',
+                          as: 'city',
+                        },
+                      },
+                      {
+                        $lookup: {
+                          from: 'categories',
+                          localField: 'category',
+                          foreignField: '_id',
+                          as: 'category',
+                        },
+                      },
+                      { $group: { _id: '$_id', news: { $first: '$$ROOT' } } },
+                      {
+                        $project: {
+                          news: '$news',
+                          index: { $indexOfCP: [{ $toLower: '$news.titleSearch' }, KhongDau(searchString)] },
+                        },
+                      },
+                      { $unwind: '$news.city' },
+                      { $unwind: '$news.category' },
+                      { $sort: { index: 1 } },
+                      {
+                        $group: {
+                          _id: null,
+                          news: { $push: '$news' },
+                          count: { $sum: 1 },
+                        },
+                      },
+                      {
+                        $project: {
+                          news: { $slice: [ '$news', Number(max.value) * Number(searchPage), Number(max.value) ] },
+                          count: '$count',
+                        },
+                      },
+                    ])
+                    .exec((err, result) => {
+                      if (err) {
+                        res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+                      } else {
+                        if (result.length > 0) {
+                          const length = result[0].count / Number(max.value) + (result[0].count % Number(max.value) === 0) ? 0 : 1;
+                          res.json({ mode: 'list', type: '', news: result[0].news, maxPage: (result[0].count !== 0) ? length : 0 });
+                        } else {
+                          res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+                        }
+                      }
+                    });
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+    return;
+  }
+
+  if (req.params.alias === 'blogs') {
+    News
+      .aggregate([
+        {
+          $match: {
+            approved: true,
+            type: 'blog',
+          }
+        },
+        { $sort: { dateCreated: -1 } },
+        {
+          $lookup: {
+            from: 'topics',
+            localField: 'topic',
+            foreignField: '_id',
+            as: 'topic',
+          }
+        },
+        { $unwind: '$topic' },
+        { $group: { _id: '$topic', news:{ $first: '$$ROOT' } }},
+        { $project: { _id: '$form._id', news: '$news', } },
+      ])
+      .exec((err, news) => {
+        if (err) {
+          res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
+        } else {
+          const arr = [];
+          news.map((n) => {
+            arr.push(n.news);
+          });
+          res.json({ mode: 'list', type: '', news: arr, maxPage: 1 });
+        }
+      });
+    return;
+  }
   Setting.findOne({ name: 'newsCount' }).exec((errSetting, max) => {
     if (errSetting) {
       res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
@@ -489,7 +676,7 @@ export function getNewsOrBlog(req, res) {
                 }
               });
           } else {
-            Category.findOne({ disable: false, alias: req.params.alias }).exec((errCategory, category) => {
+            Category.findOne({ alias: req.params.alias }).exec((errCategory, category) => {
               if (errCategory) {
                 res.json({ mode: 'list', type: '', news: [], maxPage: 1 });
               } else {
@@ -663,8 +850,6 @@ export function getNews2(req, res) {
                     }
                   });
               } else {
-                console.log(searchString);
-                console.log(searchString);
                 News
                   .aggregate([
                     {

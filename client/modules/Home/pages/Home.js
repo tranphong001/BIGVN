@@ -31,7 +31,13 @@ class Home extends Component {
   componentDidMount() {
     const params = this.props.params;
     if (params.hasOwnProperty('alias')) {
-      this.fetchNews(params.alias.toLowerCase(), '');
+      console.log(this.props.route);
+      if (this.props.route.path.indexOf('tag') !== -1) {
+        this.fetchNews(params.alias.toLowerCase(), '');
+        this.fetchTag(params.alias.toLowerCase(), '');
+      } else {
+        this.fetchNews(params.alias.toLowerCase(), '');
+      }
     } else {
       this.fetchNews('', '');
     }
@@ -45,12 +51,13 @@ class Home extends Component {
         this.props.categories.length > 0 &&
         this.props.topics.length > 0
     ) {
-      if (nextProps.route.path.indexOf('tag') !== -1) {
+      console.log(nextProps);
+      if (nextProps.route.hasOwnProperty('path') && nextProps.route.path.indexOf('tag') !== -1) {
         this.setState({ oldRoute: nextProps.route });
         this.fetchTag(nextProps.params.alias, '');
       } else {
         this.fetchNews(nextProps.params.alias, '');
-        this.setState({oldParams: nextProps.params});
+        this.setState({ oldParams: nextProps.params });
       }
     }
   }
@@ -129,6 +136,7 @@ function mapStateToProps(state) {
 }
 
 Home.propTypes = {
+  route: PropTypes.object,
   dispatch: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   categories: PropTypes.array.isRequired,
