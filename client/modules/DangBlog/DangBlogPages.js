@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
 import { getCategories, getCities, getDistricts, getWards, getId } from '../App/AppReducer';
-import { fetchDistricts, fetchWards, addDistricts, addWards, setNotify } from '../App/AppActions';
+import { fetchDistricts, fetchWards, addDistricts, addWards, setNotify, fetchKeywords } from '../App/AppActions';
 import { postNews } from '../DangTin/DangTinActions';
 import { postBlog, uploadImage, fetchTopics } from './DangBlogActions';
 import { getTopics } from './DangBlogReducer';
@@ -13,6 +13,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { Cropper } from 'react-image-cropper';
 import style from 'react-tag-autocomplete/example/styles.css';
 import ReactTags from 'react-tag-autocomplete';
+
 
 class DangBlogPages extends Component {
   constructor(props) {
@@ -161,7 +162,14 @@ class DangBlogPages extends Component {
     const tags = [].concat(this.state.tags, { name: this.titleCase(tag.name) });
     this.setState({ tags });
   };
+  handleInputChange = (input) => {
+    this.props.dispatch(fetchKeywords(input.trim())).then((res) => {
+      console.log(res);
+      this.setState({ suggestions: res.keywords });
+    });
+  };
   render() {
+    console.log(this.state.suggestions);
     return (
       <div>
         <div className="panel panel-default col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
@@ -294,9 +302,11 @@ class DangBlogPages extends Component {
                     tags={this.state.tags}
                     allowNew
                     delimiterChars ={[',']}
+                    minQueryLength={1}
                     suggestions={this.state.suggestions}
                     handleDelete={this.handleDelete}
                     handleAddition={this.handleAddition}
+                    handleInputChange={this.handleInputChange}
                   />
                 </div>
               </div>

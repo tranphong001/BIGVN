@@ -43,6 +43,14 @@ export default (
       }}
     />
     <Route
+      path="tag/:alias"
+      getComponent={(nextState, cb) => {
+        require.ensure([], require => {
+          cb(null, require('./modules/Home/pages/Home').default);
+        });
+      }}
+    />
+    <Route
       path="regulation"
       getComponent={(nextState, cb) => {
         require.ensure([], require => {

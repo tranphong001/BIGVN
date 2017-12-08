@@ -13,6 +13,8 @@ export const ACTIONS = {
   SET_RELATED: 'SET_RELATED',
   ADD_RELATED_KEYWORD_1: 'ADD_RELATED_KEYWORD_1',
   ADD_RELATED_KEYWORD_2: 'ADD_RELATED_KEYWORD_2',
+  SET_META_KEYWORD: 'SET_META_KEYWORD',
+  SET_META_DESCRIPTION: 'SET_META_DESCRIPTION',
 };
 
 export function setMaxPage(maxPage) {
@@ -69,6 +71,18 @@ export function setRelated(news) {
     news,
   };
 }
+export function setMetaKeyword(metaKeyword) {
+  return {
+    type: ACTIONS.SET_META_KEYWORD,
+    metaKeyword,
+  };
+}
+export function setMetaDescription(metaDescription) {
+  return {
+    type: ACTIONS.SET_META_DESCRIPTION,
+    metaDescription,
+  };
+}
 export function fetchRelatedNews(alias) {
   return (dispatch) => {
     return callApi(`news/related/${alias}`, 'get', '').then(res => {
@@ -85,9 +99,10 @@ export function fetchNews(alias, url) {
         dispatch(addNewsList(res.news));
       }
       if (res.mode === 'detail') {
-        console.log(res);
         dispatch(setMaxPage(res.maxPage));
         dispatch(addNews(res.news));
+        dispatch(setMetaKeyword(res.news.metaKeyword));
+        dispatch(setMetaDescription(res.news.metaDescription));
         if (res.type === 'blog') {
           dispatch(addRelatedKeyword1(res.related1));
           dispatch(addRelatedKeyword2(res.related2));
@@ -96,6 +111,30 @@ export function fetchNews(alias, url) {
           dispatch(setRelated(res.related));
         }
       }
+      return res;
+    });
+  };
+}
+export function fetchTag(alias, url) {
+  return (dispatch) => {
+    return callApi(`tag/${alias}${url}`, 'get', '').then(res => {
+      if (res.mode === 'list') {
+        dispatch(setMaxPage(res.maxPage));
+        dispatch(addNewsList(res.news));
+      }
+      // if (res.mode === 'detail') {
+      //   dispatch(setMaxPage(res.maxPage));
+      //   dispatch(addNews(res.news));
+      //   dispatch(setMetaKeyword(res.news.metaKeyword));
+      //   dispatch(setMetaDescription(res.news.metaDescription));
+      //   if (res.type === 'blog') {
+      //     dispatch(addRelatedKeyword1(res.related1));
+      //     dispatch(addRelatedKeyword2(res.related2));
+      //   }
+      //   if (res.mode === 'news') {
+      //     dispatch(setRelated(res.related));
+      //   }
+      // }
       return res;
     });
   };

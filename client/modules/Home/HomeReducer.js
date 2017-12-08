@@ -14,10 +14,16 @@ const initialState = {
 
   maxPage: 1,
   currentPage: 1,
+  metaKeyword: '',
+  metaDescription: '',
 };
 
 const HomeReducer = (state = initialState, action) => {
   switch (action.type) {
+    case ACTIONS.SET_META_KEYWORD:
+      return { ...state, metaKeyword: action.metaKeyword };
+    case ACTIONS.SET_META_DESCRIPTION:
+      return { ...state, metaDescription: action.metaDescription };
     case ACTIONS.ADD_RELATED_KEYWORD_1:
       return { ...state, relatedKeyword1: action.news };
     case ACTIONS.ADD_RELATED_KEYWORD_2:
@@ -58,5 +64,7 @@ export const getBlog = state => state.home.blog;
 export const getLoading = state => state.home.loading;
 export const getRelatedKeyword1 = state => state.home.relatedKeyword1;
 export const getRelatedKeyword2 = state => state.home.relatedKeyword2;
+export const getMetaKeyword = state => state.home.metaKeyword;
+export const getMetaDescription = state => state.home.metaDescription;
 
 export default HomeReducer;

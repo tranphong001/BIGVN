@@ -61,7 +61,7 @@ class Detail extends Component {
     this.context.router.push('/');
   };
   onKeyword = (alias) => {
-    this.context.router.push(`/${alias}`);
+    this.context.router.push(`/tag/${alias}`);
   };
   render() {
     const info = this.props.news;

@@ -10,6 +10,8 @@ router.route('/searchbycity/:city').get(NewsController.getNewsByCity);
 
 router.route('/news/:id').get(NewsController.getNewsByUserId);
 router.route('/news/get/:alias').get(NewsController.getNewsOrBlog);
+router.route('/news/type/:type').get(NewsController.getNewsByType);
+router.route('/tag/:alias').get(NewsController.getTag);
 
 router.route('/news/vip/category/:alias').get(NewsController.getNewsVipCategory);
 router.route('/news/vip/all').get(NewsController.getNewsVipAll);

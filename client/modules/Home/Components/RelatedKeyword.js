@@ -15,6 +15,7 @@ class Related extends Component {
     };
   }
   render() {
+    if (this.props.related.length === 0) return <div></div>;
     return (
       <div style={{ marginTop: '20px' }}>
         <div className={styles.relatedTitle}>

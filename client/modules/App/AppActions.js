@@ -349,3 +349,11 @@ export function fetchSetting() {
   };
 }
 
+export function fetchKeywords(alias) {
+  return () => {
+    return callApi(`keyword/${alias}`, 'get', '').then(res => {
+      return res;
+    });
+  };
+}
+

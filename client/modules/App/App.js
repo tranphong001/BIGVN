@@ -22,6 +22,7 @@ import { getIsNotify, getMessage, getServerTime, getId, getUserName } from './Ap
 import { Modal } from 'react-bootstrap';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
+import { getMetaDescription, getMetaKeyword } from '../Home/HomeReducer';
 
 export class App extends Component {
   constructor(props) {
@@ -77,11 +78,11 @@ export class App extends Component {
                 },
                 {
                   name: 'keyword',
-                  content: `${this.props.userName}`,
+                  content: `${this.props.metaKeyword}`,
                 },
                 {
                   name: 'description',
-                  content: `${this.props.userName}`,
+                  content: `${this.props.metaDescription}`,
                 },
               ]}
             />
@@ -147,10 +148,14 @@ function mapStateToProps(store) {
     userName: getUserName(store),
     message: getMessage(store),
     serverTime: getServerTime(store),
+    metaKeyword: getMetaKeyword(store),
+    metaDescription: getMetaDescription(store),
   };
 }
 App.contextTypes = {
   router: PropTypes.object,
+  metaKeyword: PropTypes.string,
+  metaDescription: PropTypes.string,
 };
 
 export default connect(mapStateToProps)(App);

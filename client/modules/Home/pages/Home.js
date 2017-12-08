@@ -14,7 +14,7 @@ import grid from '../../../grid.css';
 import List from '../Components/List';
 import style from './Home.css';
 import CircularProgress from 'material-ui/CircularProgress';
-import { searchNewsByCity, searchNews, setLoading, setRelated, fetchRelatedNews, fetchBlog, addNewsList, addBlogList, addNews, fetchNewsByCategoryVip, addNewsVipList, fetchNews, fetchBlogByAlias, fetchBlogByTopic } from '../HomeActions';
+import { fetchTag, setRelated, fetchRelatedNews, fetchBlog, addNewsList, addBlogList, addNews, fetchNewsByCategoryVip, addNewsVipList, fetchNews, fetchBlogByAlias, fetchBlogByTopic } from '../HomeActions';
 import { getCurrentPage } from '../HomeReducer';
 
 class Home extends Component {
@@ -25,9 +25,10 @@ class Home extends Component {
       oldSearchCity: '',
 
       oldParams: {},
+      oldRoute: {},
     };
   }
-  componentWillMount() {
+  componentDidMount() {
     const params = this.props.params;
     if (params.hasOwnProperty('alias')) {
       this.fetchNews(params.alias.toLowerCase(), '');
@@ -36,13 +37,21 @@ class Home extends Component {
     }
   }
   componentWillReceiveProps(nextProps) {
-    if (JSON.stringify(nextProps.params) !== JSON.stringify(this.state.oldParams) &&
+    if (
+      (
+        JSON.stringify(nextProps.params) !== JSON.stringify(this.state.oldParams) ||
+        JSON.stringify(nextProps.route) !== JSON.stringify(this.state.oldRoute)
+      ) &&
         this.props.categories.length > 0 &&
         this.props.topics.length > 0
     ) {
-      console.log(nextProps.params.alias);
-      this.fetchNews(nextProps.params.alias, '');
-      this.setState({ oldParams: nextProps.params });
+      if (nextProps.route.path.indexOf('tag') !== -1) {
+        this.setState({ oldRoute: nextProps.route });
+        this.fetchTag(nextProps.params.alias, '');
+      } else {
+        this.fetchNews(nextProps.params.alias, '');
+        this.setState({oldParams: nextProps.params});
+      }
     }
   }
   reset = () => {
@@ -57,23 +66,29 @@ class Home extends Component {
       this.setState({ mode: res.mode });
     });
   };
+  fetchTag = (alias, url) => {
+    this.reset();
+    this.props.dispatch(fetchTag(alias, url)).then((res) => {
+      this.setState({ mode: res.mode });
+    });
+  };
   render() {
     return (
       <div className="container">
-          {
-            (this.state.mode === 'list') ? (
-              <div className={`${grid.contentWidth} col-xs-12`}>
-                <List alias={this.state.alias} />
-              </div>
-            ) : ''
-          }
-          {
-            (this.state.mode === 'detail') ? (
-              <div className={`${grid.contentWidthDetail} col-xs-12`}>
-                <Detail alias={this.state.alias} />
-              </div>
-            ) : ''
-          }
+        {
+          (this.state.mode === 'list') ? (
+            <div className={`${grid.contentWidth} col-xs-12`}>
+              <List alias={this.state.alias} />
+            </div>
+          ) : ''
+        }
+        {
+          (this.state.mode === 'detail') ? (
+            <div className={`${grid.contentWidthDetail} col-xs-12`}>
+              <Detail alias={this.state.alias} />
+            </div>
+          ) : ''
+        }
 
         <div className={`${styles.vipWidth} col-xs-12 ${styles.vipSection}`}>
           <div style={{ padding: '12px 0 25px 10px' }}>

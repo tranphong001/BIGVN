@@ -46,6 +46,7 @@ import wards from './routes/ward.routes';
 import banners from './routes/banner.routes';
 import topics from './routes/topic.routes';
 import settings from './routes/setting.routes';
+import keywords from './routes/keyword.routes';
 import serverConfig from './config';
 
 // Set native promises as mongoose promise
@@ -67,7 +68,7 @@ app.use(compression());
 app.use(bodyParser.json({ limit: '30mb' }));
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: false }));
 app.use(Express.static(path.resolve(__dirname, '../dist/client')));
-app.use('/api', [banners, settings, topics, cities, districts, wards, categories, users, news]);
+app.use('/api', [banners, settings, topics, cities, districts, wards, categories, users, keywords, news]);
 
 // Render Initial HTML
 
